@@ -48,7 +48,7 @@ Support OpenSource!
 ###### Run onace
 ###### Run everytime run new terminal
 ```bash
-*source ./bin/python_env/bin/activate*
+source ./bin/python_env/bin/activate
 ```
 
 ```bash
