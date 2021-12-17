@@ -1,0 +1,7 @@
+---
+- include: yum_mongodb.yml
+  when: ansible_pkg_mgr == 'yum'
+
+- name: mongodb for apt
+  fail: msg='Deployment for apt package manager is not impplemented yet'
+  when: ansible_pkg_mgr == 'apt'

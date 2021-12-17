@@ -1,0 +1,22 @@
+service:
+  kube-proxy:
+    enabled: true
+    running: true
+command:
+#Test kubelet version
+  /usr/local/sbin/kube-proxy --version:
+    stdout:
+      - {{ k8s_version }}
+    exit-status: 0
+    timeout: 1000
+#Test kubelet health on http
+  /bin/curl http://127.0.0.1:10249/healthz:
+    stdout:
+      - ok
+    exit-status: 0
+    timeout: 1000
+  /bin/curl http://127.0.0.1:10256/healthz -I:
+    stdout:
+      - OK
+    exit-status: 0
+    timeout: 1000

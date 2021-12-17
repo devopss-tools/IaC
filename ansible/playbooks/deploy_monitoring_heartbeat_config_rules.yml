@@ -1,0 +1,6 @@
+---
+- name: Deploy containers to kubernetes
+  become: true
+  hosts: nfs-group
+  roles:
+    - { role: kubernetes_deploy_components }

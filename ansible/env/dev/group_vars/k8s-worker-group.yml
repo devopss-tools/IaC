@@ -1,0 +1,42 @@
+---
+k8s_version: "v1.18.0"
+docker_version: "19.03.9"
+cni_version: "v0.8.5"
+cni_install_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kube-addons-plugins/cni-plugins-linux-amd64-{{ cni_version }}.tgz"
+cniSpec_version: "0.4.0"
+
+linux_filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/kubernetes"},
+#                        {"dev" : "{{ groups['nfs-group'][0] }}:{{ nfs_storage_dir }}/data-volumes/k8s-volumes", "fstype" : "nfs4", "path" : "/mnt/k8s-volumes"}
+                      ]
+k8s_api_server_ip: 172.18.0.1
+container_network_config_pod_cidr : "{{ kubelet_config_pod_cidr }}"
+k8s_certificate_root_path: "{{ certificates_root_path }}/k8s"
+fileabet_inputs: [k8sdocker]
+DNS_SERVICE_IP: "10.1.1.2"
+
+gitlab_docker_registry_url: "gitlab.com"
+gitlab_docker_registry_port: "4567"
+gitlab_docker_registry_user: "gladmin-image-registry-token"
+gitlab_docker_registry_user_token: "{{ vault_gitlab_docker_registry_token }}"
+gitlab_runners_registration_token: "{{ vault_gitlab_runners_registration_token }}"
+gitlab_runner_docker_image: "{{ gitlab_docker_registry_url }}:{{ gitlab_docker_registry_port }}/devopss-iaas/k8s-deployment:docker-18-git"
+
+firewalld_port:
+  kubelet-api:
+    port: 10250
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  readonly-kubelet-api:
+    port: 10255
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  nodeport-services:
+    port: 30000-32767
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true

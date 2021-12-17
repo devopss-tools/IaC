@@ -1,0 +1,3 @@
+{% for host in groups['k8s-worker-group'] %}
+{{linux_filesystem_map.0.path}}      {{ hostvars[host]['ansible_host'] }}(rw,sync,no_root_squash,no_all_squash) 
+{% endfor %}

@@ -1,0 +1,21 @@
+#Test mount points
+mount:
+{% for filesystem in linux_filesystem_map %}
+ {{ filesystem.path }}:
+   # required attributes
+   exists: true
+   # optional attributes
+   opts:
+   - rw
+   - relatime
+   source: {{ filesystem.dev }}
+   filesystem: {{ filesystem.fstype }}
+{% endfor %}
+
+#Test storage empty space
+command:
+{% for filesystem in linux_filesystem_map %}
+   test `df {{ filesystem.path }} | tail -n 1 | awk '{ print $5}' | cut -d'%' -f 1` -lt {{ storage_percent_warn }}:
+     exit-status: 0
+     timeout: 1000
+{% endfor %}

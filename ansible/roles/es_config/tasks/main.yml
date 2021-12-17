@@ -1,0 +1,68 @@
+---
+- name: ES {{ es_version }} - create elasticsearch.yml file
+  template:
+    src: versions/elasticsearch.{{ es_version }}.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: elasticsearch
+    group: elasticsearch
+    mode: "0660"
+    backup: yes
+
+- name: ES {{ es_version }} -  create scripts dir
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: elasticsearch
+    group: elasticsearch
+    recurse: yes
+  with_items:
+     - "{{ es_config_scripts_path }}"
+     - "{{ linux_filesystem_map.0.path }}"
+
+- name: ES {{ es_version }} -  create scripts dir
+  template:
+    src: jvm.options.j2
+    dest: "/etc/elasticsearch/jvm.options"
+    owner: elasticsearch
+    group: elasticsearch
+    mode: "0755"
+    backup: yes
+
+- selinux:
+    state: disabled
+
+- name: ES {{ es_version }} - copy goss test cluster name
+  template:
+    src: es.yml
+    dest: /etc/elasticsearch/es.yml
+    owner: elasticsearch
+    group: elasticsearch
+    mode: "0660"
+    backup: yes
+
+- name: ES {{ es_version }} -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 9200 will fail if elastic-server was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 9200
+    delay: 5
+    timeout: 120
+
+- name: Check if the service is running on port 9300 will fail if elastic-server was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 9300
+    delay: 5
+    timeout: 60
+
+- name: import goss test role
+  import_role:
+    name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules
+

@@ -1,0 +1,7 @@
+---
+#
+- name: monit_reload
+  service:
+    name: monit
+    enabled: yes
+    state: reloaded

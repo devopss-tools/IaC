@@ -1,0 +1,8 @@
+check host 127.0.0.1 with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start haproxy" with timeout 10 seconds
+  # stop program = "/bin/systemctl stop haproxy"
+{% for var in frontend_k8s %}
+  if failed port {{ var.port }} then exec "/etc/monit.d/monit2telegram {{ var.name }} {{ var.port }}"  repeat every 5 cycles
+  if failed port {{ var.port }}  then start every 10 cycles
+{% endfor %}
+

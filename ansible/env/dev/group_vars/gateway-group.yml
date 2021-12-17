@@ -1,0 +1,30 @@
+# Firewall settings
+firewalld_port:
+  http:
+    port: 80
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  https:
+    port: 443
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+
+# Kubernetes Ingress external IPs, upstream's
+upstream: [
+            {"k8s_Ingress_Controller_Host" : "10.1.1.93"},
+            {"k8s_Ingress_Controller_Host" : "10.1.1.96"},
+            {"k8s_Ingress_Controller_Host" : "10.1.1.98"}
+          ]
+
+nginx_config_virtulhost_files: [
+                                 {"src" : "404.conf.j2", "dest" : "404.conf"},
+                                 {"src" : "finecredit.conf.j2", "dest" : "finecredit.conf"},
+
+
+notfound: {"domain": "notfound.devopss.net", "port": 80, "path" : "/", "proxypass": "404" }
+
+

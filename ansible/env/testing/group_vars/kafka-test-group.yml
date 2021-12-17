@@ -1,0 +1,41 @@
+---
+linux_filesystem_map: [
+  {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/data"} ]
+
+kafka_zk_admin: "admin"
+kafka_zk_password: "{{ vault_kafka_zk_passwd }}"
+kafka_hosts_group_name: "kafka-test-group"
+kafka_auth: "true"
+
+# Firewall settings
+firewalld_port:
+  kafka:
+    port: 9092
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  kafka-internal:
+    port: 9092
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true
+  zookeeper-2181:
+    port: 2181
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  zookeeper-2888:
+    port: 2888
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true
+  zookeeper-3888:
+    port: 3888
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true

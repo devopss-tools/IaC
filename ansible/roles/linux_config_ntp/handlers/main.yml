@@ -1,0 +1,12 @@
+---
+# enable ntpd service
+- name: ntpd_enable
+  service:
+    name: ntpd
+    enabled: yes
+
+# enable ntpd service
+- name: ntpd_start
+  service:
+    name: ntpd
+    state: started

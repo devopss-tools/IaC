@@ -1,0 +1,9 @@
+---
+- name: deploy rabbitmq server
+  become: true
+  hosts: rabbitmq-group
+  roles:
+    # deploy rabbitmq
+   - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/rabbitmq-erlang/{{erlang_version}}/erlang-{{erlang_version}}-1.el7.x86_64.rpm'],  tags: [ "rabbitmq_deploy"]}
+   - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/rabbitmq/{{rabbitmq_version}}/rabbitmq-server-{{rabbitmq_version}}-1.el7.noarch.rpm'],  tags: [ "rabbitmq_deploy"]}
+   - { role: rabbitmq, tags: [ "rabbitmq_deploy"], when: ansible_os_family == 'RedHat'}

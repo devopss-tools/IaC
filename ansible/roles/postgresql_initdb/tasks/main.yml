@@ -1,0 +1,70 @@
+---
+- name: Set permissions for postgres working directory
+  file:
+    path: "{{ linux_filesystem_map.0.path }}"
+    state: directory
+    mode: "0700"
+    owner: postgres
+    group: postgres
+
+- name: create data folder
+  file:
+    path: "{{ postgresql_initdb_pgdata }}"
+    state: directory
+    mode: "0700"
+    owner: postgres
+    group: postgres
+
+- name: create logs folder
+  file:
+    path: "{{ postgresql_logs_dir }}"
+    state: directory
+    mode: "0755"
+    owner: postgres
+    group: postgres
+
+- name: generate password for superuser
+  become: true
+  become_user: postgres
+#  shell: test -a "{{ postgresql_initdb_pwfile}}" || ( head /dev/urandom | tr -dc A-Za-z0-9 | head -c 50 >"{{ postgresql_initdb_pwfile}}")
+  shell: echo "{{ devopss_su_admin_passwd }}" > "{{ postgresql_initdb_pwfile }}"
+
+- name: create sql profile
+  file:
+    path: "{{ postgresql_initdb_profile }}"
+    state: touch
+    mode: "0600"
+    owner: postgres
+    group: postgres
+
+- name: export PGPASWORD into profile
+  become: true
+  become_user: postgres
+  lineinfile:
+    dest: "{{ postgresql_initdb_profile }}"
+    regexp: "^export PGPASSWORD="
+    line: "export PGPASSWORD=$(cat {{ postgresql_initdb_pwfile }} )"
+    state: present
+
+- command: cat {{ postgresql_initdb_pwfile }}
+  register: result
+
+
+- name: create password for data base admin
+  file:
+    path: "{{ postgresql_initdb_pwfile }}"
+    state: touch
+    mode: "0600"
+    owner: postgres
+    group: postgres
+
+- name: init postgresql data base
+  become: true
+  become_user: postgres
+  command: "{{ postgresql_initdb_cmd }}"
+  notify:
+    - pg_restart
+
+- name: Delete pwfile
+  command: rm -f {{ postgresql_initdb_pwfile }}
+

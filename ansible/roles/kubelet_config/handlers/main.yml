@@ -1,0 +1,15 @@
+---
+- name: systemd_reload
+  shell: systemctl daemon-reload
+
+# enable kubelet service
+- name: kubelet_enable
+  service:
+    name: kubelet
+    enabled: yes
+
+# restart kubelet service
+- name: kubelet_restart
+  service:
+    name: kubelet
+    state: restarted

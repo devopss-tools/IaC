@@ -1,0 +1,25 @@
+---
+- name: iptables serfice config file
+  template:
+    src: iptables-config.j2
+    dest: "/etc/sysconfig/iptables-config"
+    owner: root
+    group: root
+    mode: "0600"
+    backup: yes
+
+- name: iptables rules
+  template:
+    src: iptables.j2
+    dest: "/etc/sysconfig/iptables"
+    owner: root
+    group: root
+    mode: "0600"
+    backup: yes
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import goss tests tasks
+  import_role:
+    name: goss_test

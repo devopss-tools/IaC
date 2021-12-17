@@ -1,0 +1,16 @@
+{
+  "CN": "system:kube-proxy",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "MD",
+      "L": "Chisinau",
+      "O": "system:node-proxier",
+      "OU": "Cluster",
+      "ST": "Chisinau"
+    }
+  ]
+}

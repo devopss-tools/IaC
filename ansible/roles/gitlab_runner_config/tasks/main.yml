@@ -1,0 +1,42 @@
+---
+- name: Login into private registry "{{ gitlab_docker_registry_url }}"
+  docker_login:
+    registry: "{{ gitlab_docker_registry_url }}:{{ gitlab_docker_registry_port }}"
+    username: "{{ gitlab_docker_registry_user }}"
+    password: "{{ gitlab_docker_registry_user_token }}"
+    reauthorize: yes
+
+- name: GitLab Runner  -  Sleep for 5 seconds and continue with play
+  wait_for:
+    timeout: 5
+
+- name: UnRegister runner from GitLab
+  shell: "sudo gitlab-runner unregister  --url https://{{ gitlab_docker_registry_url }} --all-runners --name {{ gitlab_runner_name }} --config /etc/gitlab-runner/config.toml"
+
+
+- name: GitLab Runner  -  Sleep for 5 seconds and continue with play
+  wait_for:
+    timeout: 5
+
+- name: Register runner to GitLab
+  command: "gitlab-runner register  \
+    --non-interactive  \
+    --url 'https://{{ gitlab_docker_registry_url }}'  \
+    --registration-token '{{ gitlab_runners_registration_token }}'  \
+    --name '{{ gitlab_runner_name }}'  \
+	  --tag-list '{{ tag_list }}'  \
+    --executor 'docker'  \
+	  --docker-volumes '/var/run/docker.sock:/var/run/docker.sock'  \
+    --docker-image '{{ gitlab_runner_docker_image }}' "
+
+- name: GitLab Runner -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import goss test role
+  import_role:
+    name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules
+

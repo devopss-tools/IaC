@@ -1,0 +1,41 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: nginx
+spec:
+ replicas: 1
+ template:
+   metadata:
+     labels:
+       app: nginx-app
+   spec:
+     containers:
+      - name: babaliste-dashboard
+        image: nginx:latest
+        ports:
+          - containerPort: 80
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: false
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    expose: "true"
+    app: babaliste-dashboard
+  name: babaliste-dashboard
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30011
+  selector:
+    app: nginx-app
+  type: NodePort
+#  externalIPs:
+#  - 10.3.3.150

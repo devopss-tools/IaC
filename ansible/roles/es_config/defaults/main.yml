@@ -1,0 +1,5 @@
+---
+es_config_scripts_path : "/etc/elasticsearch/scripts"
+es_config_reload_scripts_interval: 60s
+goss_test_files: ["es.yml"]
+monit_rules_files: ["es.monit"]

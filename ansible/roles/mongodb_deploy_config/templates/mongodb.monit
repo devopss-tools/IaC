@@ -1,0 +1,5 @@
+check host localhost with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start mongod" with timeout 60 seconds
+  stop program = "/bin/systemctl stop mongod"
+  if failed port 27017 then exec "/etc/monit.d/monit2telegram MongoDB"  repeat every 2 cycles
+  if failed port 27017 then restart every 5 cycles

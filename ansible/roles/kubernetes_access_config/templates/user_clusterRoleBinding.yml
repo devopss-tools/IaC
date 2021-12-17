@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ item.value.serviceAccount }}
+  namespace: {{ item.value.name }}
+
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ item.value.role }}-role
+  namespace: {{ item.value.name }}
+rules:
+  - verbs:
+      - '*'
+    apiGroups:
+      - '*'
+    resources:
+      - '*'
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ item.value.role }}-cluster-role
+  namespace: {{ item.value.name }}
+rules:
+  - verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+    apiGroups: ['*']
+    resources: ['ingress', 'ingresses', 'cron', 'cronjobs', 'crontabs']
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ item.value.userName }}-rolebinding
+  namespace: {{ item.value.name }}
+subjects:
+  - kind: User
+    name: {{ item.value.userName }}
+    apiGroup: rbac.authorization.k8s.io
+    namespace: {{ item.value.name }}
+  - kind: ServiceAccount
+    name: {{ item.value.serviceAccount }}
+    namespace: {{ item.value.name }}
+roleRef:
+#  kind: ClusterRole
+  kind: Role
+  name: {{ item.value.role }}-role
+  apiGroup: rbac.authorization.k8s.io
+
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ item.value.userName }}-cluster-rolebinding
+  namespace: {{ item.value.name }}
+subjects:
+  - kind: User
+    name: {{ item.value.userName }}
+    apiGroup: rbac.authorization.k8s.io
+    namespace: {{ item.value.name }}
+  - kind: ServiceAccount
+    name: {{ item.value.serviceAccount }}
+    namespace: {{ item.value.name }}
+roleRef:
+  kind: ClusterRole
+  name: {{ item.value.role }}-cluster-role
+  apiGroup: rbac.authorization.k8s.io

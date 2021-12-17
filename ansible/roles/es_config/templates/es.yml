@@ -1,0 +1,57 @@
+service:
+  elasticsearch:
+    enabled: true
+    running: true
+
+#Test cluster status
+command:
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_cluster/health -s | jq .status -r:
+     stdout:
+         - green
+     exit-status: 0
+     timeout: 1000
+#Test cluster name
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_cluster/health -s | jq .cluster_name -r:
+     stdout:
+        - {{ es_cluster_name }}
+     exit-status: 0
+     timeout: 1000
+#Test cluster nr of nodes
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_cluster/health -s | jq .number_of_nodes -r:
+      stdout:
+         - {{ es_group_length }}
+      exit-status: 0
+      timeout: 1000
+#Test cluster version
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/ -s | jq .version.number -r:
+      stdout:
+         - {{ es_version }}
+      exit-status: 0
+      timeout: 1000
+#Test cluster nodes
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_nodes -s | jq '.nodes[] | .name'  -r  | grep {{ ansible_host }}:
+      stdout:
+         - {{ ansible_host }}
+      exit-status: 0
+      timeout: 1000
+
+# Test modules are activatet
+{% if es_major_version == '5.x' %}
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_nodes -s |  jq '.nodes[] | select(.name=="{{ ansible_host }}") | .modules[] | select(.name=="lang-groovy")' -r:
+      stdout:
+         - "/.*lang-groovy.*/"
+      exit-status: 0
+      timeout: 1000000
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_nodes -s |  jq '.nodes[] | select(.name=="{{ ansible_host }}") | .modules[] | select(.name=="lang-expression")' -r:
+      stdout:
+         - "/.*lang-expression.*/"
+      exit-status: 0
+      timeout: 1000000
+{% elif es_major_version == '7.x' %}
+   curl http://{{ ansible_currentHost_fact_hostname }}:9200/_nodes -s |  jq '.nodes[] | select(.name=="{{ ansible_host }}") | .modules[]' -r | grep "x-pack":
+      stdout:
+         - "/.*x-pack.*/"
+      exit-status: 0
+      timeout: 1000000
+{% endif %}
+

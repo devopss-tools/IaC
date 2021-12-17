@@ -1,0 +1,19 @@
+service:
+  kube-apiserver:
+    enabled: true
+    running: true
+
+command:
+#Test kube-apiserver version
+  /usr/local/sbin/kube-apiserver --version:
+    stdout:
+      - {{ k8s_version }}
+    exit-status: 0
+    timeout: 1000
+
+#Test kube-apiserver health on http
+  /bin/curl http://127.0.0.1:8080/healthz:
+    stdout:
+      - ok
+    exit-status: 0
+    timeout: 1000

@@ -1,0 +1,9 @@
+---
+- name: deploy redis server
+  become: true
+  hosts:
+    - storage-group
+    - redis-group
+  roles:
+   - { role: redis_install, tags: [ "redis_deploy", "redis_install"], when: ansible_os_family == 'RedHat'}
+   - { role: redis_config, tags: [ "redis_deploy", "redis_config"], when: ansible_os_family == 'RedHat'}

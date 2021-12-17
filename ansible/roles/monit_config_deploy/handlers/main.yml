@@ -1,0 +1,7 @@
+---
+# enable nginx service
+- name: monit_restart
+  service:
+    name: monit
+    enabled: yes
+    state: restarted

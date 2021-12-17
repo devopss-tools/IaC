@@ -1,0 +1,5 @@
+linux_filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/redis"} ]
+
+redis_storage_dir: "/var/lib/redis/redis"
+
+vault_redis_password: "{{vault_devopss_io_redis_password}}"

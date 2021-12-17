@@ -1,0 +1,313 @@
+namespaces:
+  stream:
+    name: stream
+    userName: admin-stream
+    serviceAccount: admin-stream
+    role: admin-stream
+    status: active
+  stream:
+    name: stream
+    userName: admin-stream
+    serviceAccount: admin-stream
+    role: admin-stream
+    status: active
+  reactive:
+    name: reactive
+    userName: admin-reactive
+    serviceAccount: admin-reactive
+    role: admin-reactive
+    status: active
+  15thday:
+    name: 15thday
+    userName: admin-15thday
+    serviceAccount: admin-15thday
+    role: admin-15thday
+    status: active
+  cyberqueue:
+    name: cyberqueue
+    userName: admin-cyberqueue
+    serviceAccount: admin-cyberqueue
+    role: admin-cyberqueue
+    status: active
+  delta:
+    name: delta
+    userName: admin-delta
+    serviceAccount: admin-delta
+    role: admin-delta
+    status: active
+  global:
+    name: global
+    userName: admin-global
+    serviceAccount: admin-global
+    role: admin-global
+    status: active
+  pyoneers:
+    name: pyoneers
+    userName: admin-pyoneers
+    serviceAccount: admin-pyoneers
+    role: admin-pyoneers
+    status: active
+  fearless:
+    name: fearless
+    userName: admin-fearless
+    serviceAccount: admin-fearless
+    role: admin-fearless
+    status: active
+  bruteforce:
+    name: bruteforce
+    userName: adm-bruteforce
+    serviceAccount: adm-bruteforce
+    role: adm-bruteforce
+    status: active
+  parents:
+    name: parents
+    userName: admin-parents
+    serviceAccount: admin-parents
+    role: admin-parents
+    status: active
+  asante:
+    name: asante
+    userName: admin-asante
+    serviceAccount: admin-asante
+    role: admin-asante
+    status: active
+  barbershop:
+    name: barbershop
+    userName: admin-barbershop
+    serviceAccount: admin-barbershop
+    role: admin-barbershop
+    status: active
+  credit-report:
+    name: credit-report
+    userName: admin-credit-report
+    serviceAccount: admin-credit-report
+    role: admin-credit-report
+    status: active
+  skype-schedule:
+    name: skype-schedule
+    userName: admin-skype-schedule
+    serviceAccount: admin-skype-schedule
+    role: admin-skype-schedule
+    status: active
+  abac-mobile:
+    name: abac-mobile
+    userName: admin-abac-mobile
+    serviceAccount: admin-abac-mobile
+    role: admin-abac-mobile
+    status: active
+  abac-mobile:
+    name: abac-mobile
+    userName: admin-02-abac-mobile
+    serviceAccount: admin-02-abac-mobile
+    role: admin-02-abac-mobile
+    status: active
+  test-billing:
+    name: test-billing
+    userName: admin-test-billing
+    serviceAccount: admin-test-billing
+    role: admin-test-billing
+    status: active
+  global-aggregator:
+    name: global-aggregator
+    userName: admin-global-aggregator
+    serviceAccount: admin-global-aggregator
+    role: admin-global-aggregator
+    status: active
+  eurasia-precept:
+    name: eurasia-precept
+    userName: admin-eurasia-precept
+    serviceAccount: admin-eurasia-precept
+    role: admin-eurasia-precept
+    status: active
+  abac-payment:
+    name: abac-payment
+    userName: admin-abac-payment
+    serviceAccount: admin-abac-payment
+    role: admin-abac-payment
+    status: active
+  yptender2:
+    name: yptender2
+    userName: admin-yptender2
+    serviceAccount: admin-yptender2
+    role: admin-yptender2
+    status: active
+  procrastinauts:
+    name: procrastinauts
+    userName: admin-procrastinauts
+    serviceAccount: admin-procrastinauts
+    role: admin-procrastinauts
+    status: active
+  mikrokapital:
+    name: mikrokapital
+    userName: admin-mikrokapital
+    serviceAccount: admin-mikrokapital
+    role: admin-mikrokapital
+    status: active
+  zoomcredit:
+    name: zoomcredit
+    userName: admin-zoomcredit
+    serviceAccount: admin-zoomcredit
+    role: admin-zoomcredit
+    status: active
+  globaldatabase-shop-v2:
+    name: globaldatabase-shop-v2
+    userName: admin-globaldatabase-shop-v2
+    serviceAccount: admin-globaldatabase-shop-v2
+    role: admin
+    status: active
+  lensa:
+    name: lensa
+    userName: admin-lensa
+    serviceAccount: admin-lensa
+    role: admin-lensa
+    status: active
+
+
+
+
+
+
+
+
+
+
+
+###########  Additional users for Lens (only for namespaces before fix role)
+  stream:
+    name: stream
+    userName: adm-stream
+    serviceAccount: adm-stream
+    role: adm-stream
+    status: active
+  stream:
+    name: stream
+    userName: adm-stream
+    serviceAccount: adm-stream
+    role: adm-stream
+    status: active
+  reactive:
+    name: reactive
+    userName: adm-reactive
+    serviceAccount: adm-reactive
+    role: adm-reactive
+    status: active
+  15thday:
+    name: 15thday
+    userName: adm-15thday
+    serviceAccount: adm-15thday
+    role: adm-15thday
+    status: active
+  cyberqueue:
+    name: cyberqueue
+    userName: adm-cyberqueue
+    serviceAccount: adm-cyberqueue
+    role: adm-cyberqueue
+    status: active
+  delta:
+    name: delta
+    userName: adm-delta
+    serviceAccount: adm-delta
+    role: adm-delta
+    status: active
+  global:
+    name: global
+    userName: adm-global
+    serviceAccount: adm-global
+    role: adm-global
+    status: active
+  pyoneers:
+    name: pyoneers
+    userName: adm-pyoneers
+    serviceAccount: adm-pyoneers
+    role: adm-pyoneers
+    status: active
+  fearless:
+    name: fearless
+    userName: adm-fearless
+    serviceAccount: adm-fearless
+    role: adm-fearless
+    status: active
+  bruteforce:
+    name: bruteforce
+    userName: adm-bruteforce
+    serviceAccount: adm-bruteforce
+    role: adm-bruteforce
+    status: active
+  parents:
+    name: parents
+    userName: adm-parents
+    serviceAccount: adm-parents
+    role: adm-parents
+    status: active
+  asante:
+    name: asante
+    userName: adm-asante
+    serviceAccount: adm-asante
+    role: adm-asante
+    status: active
+  barbershop:
+    name: barbershop
+    userName: adm-barbershop
+    serviceAccount: adm-barbershop
+    role: adm-barbershop
+    status: active
+  credit-report:
+    name: credit-report
+    userName: adm-credit-report
+    serviceAccount: adm-credit-report
+    role: adm-credit-report
+    status: active
+  skype-schedule:
+    name: skype-schedule
+    userName: adm-skype-schedule
+    serviceAccount: adm-skype-schedule
+    role: adm-skype-schedule
+    status: active
+  abac-mobile:
+    name: abac-mobile
+    userName: adm-abac-mobile
+    serviceAccount: adm-abac-mobile
+    role: adm-abac-mobile
+    status: active
+  abac-mobile:
+    name: abac-mobile
+    userName: adm-02-abac-mobile
+    serviceAccount: adm-02-abac-mobile
+    role: adm-02-abac-mobile
+    status: active
+  test-billing:
+    name: test-billing
+    userName: adm-test-billing
+    serviceAccount: adm-test-billing
+    role: adm-test-billing
+    status: active
+  global-aggregator:
+    name: global-aggregator
+    userName: adm-global-aggregator
+    serviceAccount: adm-global-aggregator
+    role: adm-global-aggregator
+    status: active
+  eurasia-precept:
+    name: eurasia-precept
+    userName: adm-eurasia-precept
+    serviceAccount: adm-eurasia-precept
+    role: adm-eurasia-precept
+    status: active
+  abac-payment:
+    name: abac-payment
+    userName: adm-abac-payment
+    serviceAccount: adm-abac-payment
+    role: adm-abac-payment
+    status: active
+  hiring:
+    name: hiring
+    userName: admin-hiring
+    serviceAccount: admin-hiring
+    role: admin-hiring
+    status: active
+  prsnt:
+    name: prsnt
+    userName: admin-prsnt
+    serviceAccount: admin-prsnt
+    role: admin-prsnt
+    status: active

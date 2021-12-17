@@ -1,0 +1,6 @@
+check host localhost with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start elasticsearch" with timeout 60 seconds
+  stop program = "/bin/systemctl stop elasticsearch"
+  if failed port 9200 then exec "/etc/monit.d/monit2telegram ElastiSearch 9200"  repeat every 2 cycles
+  if failed port 9300 then exec "/etc/monit.d/monit2telegram ElastiSearch 9300"  repeat every 2 cycles
+  if failed port 9200 then restart every 5 cycles

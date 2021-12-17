@@ -1,0 +1,19 @@
+service:
+  rpcbind:
+    enabled: true
+    running: true
+  nfs-server:
+    enabled: true
+    running: true
+  nfs-lock:
+    enabled: true
+    running: true
+  nfs-idmap:
+    enabled: true
+    running: true
+  nfs-mountd:
+    enabled: true
+    running: true
+  monit:
+    enabled: true
+    running: true

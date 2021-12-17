@@ -1,0 +1,38 @@
+---
+
+- name: Configure log4j.properties
+  template:
+    src: log4j.properties.j2
+    dest: "{{ kafka_install_dir }}/config/log4j.properties"
+  notify:
+    - kafka_restart
+
+# Kafka confguration
+- name: Configure server.properties for "{{ kafka_hosts_group_name }}"
+  template:
+    src: "{{ kafka_hosts_group_name }}/server.properties.j2"
+    dest: '{{ kafka_install_dir }}/config/server.properties'
+    owner: "{{ kafka_os_user }}"
+    group: "{{ kafka_os_group }}"
+    mode: "0600"
+  when: kafka_hosts_group_name != ''
+
+# Kafka service
+- name: systemd script
+  template:
+    src: kafka.service.j2
+    dest: /etc/systemd/system/kafka.service
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+#  notify:
+#    - systemd_reload
+#    - kafka_enable
+#    - kafka_restart
+
+- name: Configure kafka_server_jaas.conf
+  template:
+    src: kafka_server_jaas.conf.j2
+    dest: "{{ kafka_install_dir }}/config/kafka_server_jaas.conf"
+  when: kafka_auth is defined

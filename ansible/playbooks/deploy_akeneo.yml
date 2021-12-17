@@ -1,0 +1,11 @@
+---
+- name: Akeneo
+  become: true
+  hosts:
+    - akeneo-group
+  roles:
+    # Install Akeneo tip appliucations
+#    - { role: package, pkgs: ["libselinux-python"] }
+    - { role: akeneo_deploy }
+#  vars:
+#    ansible_python_interpreter: "/bin/python3"

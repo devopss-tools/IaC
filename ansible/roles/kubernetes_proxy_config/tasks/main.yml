@@ -1,0 +1,143 @@
+---
+
+- name: Check if exist k8s Kube-Proxy certificates
+  local_action: "shell if [ -f {{ k8s_certificate_root_path }}/kube-proxy.pem ] && \
+                          [ -f {{ k8s_certificate_root_path }}/kube-proxy-key.pem ] ; \
+                      then echo Kube-Proxy files exist; fi "
+  register: result
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+
+- name: Create configuration csr file
+  local_action: "template src=kube-proxy-csr.json.j2 dest={{ k8s_certificate_root_path }}/kube-proxy-csr.json"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  when: result.stdout == ""
+
+- name: Copy/decrypt CA file
+  local_action: template src="{{ ca_certificate_file }}" dest="{{ ca_certificate_file }}"
+  become_user: "{{ lookup('env','USER') }}"
+  when: result.stdout == ""
+
+- name: Copy/decrypt CA key file
+  local_action: template src="{{ ca_key_path }}" dest="{{ ca_key_path }}"
+  become_user: "{{ lookup('env','USER') }}"
+  when: result.stdout == ""
+
+- name: Create k8s certificate and access key
+  local_action: "shell {{ binaries_root_path }}/cfssl gencert -ca={{ ca_certificate_file }} \
+                                    -ca-key={{ ca_key_path }} \
+                                    -config={{ certificate_config }} \
+                                    -profile=kubernetes \
+                                    {{ k8s_certificate_root_path }}/kube-proxy-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ k8s_certificate_root_path }}/kube-proxy"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  when: result.stdout == ""
+
+#### Configure kube-proxy.kubeconfig
+
+- name: Kubectl - Set cluster
+  local_action: "shell kubectl config set-cluster kubernetes-{{item}} \
+                                    --server=https://{{ hostvars[item]['ansible_host'] }}:6443 \
+                                    --embed-certs=true \
+                                    --certificate-authority={{ ca_certificate_file }} \
+                                    --kubeconfig={{ k8s_certificate_root_path }}/kube-proxy.kubeconfig"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  with_items: "{{ groups['k8s-master-group'] }}"
+  when: result.stdout == ""
+
+#- meta: end_play
+#                                    --server=https://{{groups['k8s-master-group'][0]}}:6443 \
+
+- name: Kubectl - set credetials
+  local_action: "shell kubectl config set-credentials kube-proxy \
+                                    --embed-certs=true \
+                                    --client-certificate={{ k8s_certificate_root_path }}/kube-proxy.pem \
+                                    --client-key={{ k8s_certificate_root_path }}/kube-proxy-key.pem \
+                                    --kubeconfig={{ k8s_certificate_root_path }}/kube-proxy.kubeconfig"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+#  with_items: "{{ groups['k8s-master-group'] }}"
+
+- name: Kubectl - set context
+  local_action: "shell kubectl config set-context default \
+                                    --cluster=kubernetes-{{item}} \
+                                    --user=kube-proxy \
+                                    --kubeconfig={{ k8s_certificate_root_path }}/kube-proxy.kubeconfig"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  with_items: "{{ groups['k8s-master-group'] }}"
+
+- name: Kubectl - use context
+  local_action: "shell kubectl config use-context default --kubeconfig={{ k8s_certificate_root_path }}/kube-proxy.kubeconfig"
+  run_once: true
+  become_user: "{{ lookup('env','USER') }}"
+
+- file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+    recurse: yes
+  with_items:
+     - "/var/lib/kubernetes/kube-proxy"
+
+- file:
+    path: "{{ item }}"
+    state: touch
+    mode: "0755"
+    owner: root
+    group: root
+  with_items:
+     - "/var/lib/kubernetes/kube-proxy/kubeconfig"
+
+- template:
+    src: kube-proxy.service.j2
+    dest: "/etc/systemd/system/kube-proxy.service"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+
+- name: Copy/create kubeconfig proxy file
+  template:
+    src: "{{ k8s_certificate_root_path }}/kube-proxy.kubeconfig"
+    dest: "/var/lib/kubernetes/kube-proxy/kubeconfig"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+
+- name: Start and set up firewalld (required for adding masquerade)
+  become: yes
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+- name: Add masquerade (required for docker on centos)
+  firewalld:
+    masquerade: yes
+    state: enabled
+    permanent: yes
+    zone: public
+
+- name: Add http rule (required for django aplication's)
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Import monit alert rules
+  import_role:
+    name: monit_rules
+
+- name: import goss tests tasks
+  import_role:
+    name: goss_test
+  tags: "k8sworker_goss_tests"

@@ -1,0 +1,7 @@
+---
+- name: deploy mongodb cluster
+  become: true
+  hosts: mongodb-group
+  roles:
+    - { role: mongodb_deploy, tags: [ "mongodb_deploy"] }
+    - { role: mongodb_deploy_config, tags: [ "mongodb_config"] }

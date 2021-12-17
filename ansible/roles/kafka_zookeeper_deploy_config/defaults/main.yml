@@ -1,0 +1,17 @@
+---
+# Kafka zookeeper settings
+kafka_os_user: kafka
+kafka_os_group: kafka
+kafka_install_dir: /usr/local/kafka
+kafka_log_dir: /var/lib/data/kafka/logs
+kafka_zookeeper_connection_timeout: 6000
+zookeeper_connect_port: '2181'
+zk_datadir: /var/lib/data/zookeeper/data
+zk_waldir: /var/lib/data/zookeeper/wal
+zk_logs: /var/lib/data/zookeeper/logs
+zk_home: "{{ kafka_install_dir }}"
+
+monit_rules_files: ["kafka.monit"]
+goss_test_files: ["kafka.yml"]
+
+

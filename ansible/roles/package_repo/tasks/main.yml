@@ -1,0 +1,7 @@
+---
+- import_tasks: yum_package_repo.yml
+  when: ansible_pkg_mgr == 'yum'
+
+- name: install via apt
+  fail: msg='Deployment for apt repo package manager is not impplemented yet'
+  when: ansible_pkg_mgr == 'apt'

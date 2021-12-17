@@ -1,0 +1,4 @@
+---
+mongodb_deploy_config_replica_name: "mongocomprod"
+goss_test_files: ["mongodb.yml"]
+monit_rules_files: ["mongodb.monit"]

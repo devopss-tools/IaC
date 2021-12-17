@@ -1,0 +1,11 @@
+---
+- name: filebeat_enable
+  service:
+    name: filebeat
+    enabled: yes
+
+- name: filebeat_restart
+  service:
+    name: filebeat
+    state: restarted
+    enabled: yes

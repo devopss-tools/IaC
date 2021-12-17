@@ -1,0 +1,4 @@
+---
+kubernetes_apiserver_config_datadir: "/var/lib/kubernetes/kubernetes_apiserver"
+goss_test_files: ["kube-apiserver.yml"]
+monit_rules_files: ["kube-apiserver.monit"]

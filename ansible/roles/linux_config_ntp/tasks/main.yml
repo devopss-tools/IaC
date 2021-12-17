@@ -1,0 +1,13 @@
+---
+- name: config hostname
+  shell: hostname
+  notify:
+    - ntpd_enable
+    - ntpd_start
+
+- name: enable time zone
+  file:
+    src: "{{ linux_config_ntp_zoneinfo_path }}"
+    dest: /etc/localtime
+    state: link
+    force: yes

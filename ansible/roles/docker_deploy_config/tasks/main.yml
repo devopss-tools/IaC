@@ -1,0 +1,39 @@
+---
+# create a directory if it doesn"t exist
+- file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  with_items:
+     - "{{ docker_config_dir }}"
+#     - "{{ docker_config_datadir }}"
+     - "{{ docker_config_root }}"
+  notify:
+    - docker_enable
+    - docker_restart
+
+- name: Copy daemon.jsonfile
+  template:
+    src: daemon.json.j2
+    dest: "{{ docker_config_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+    backup: yes
+  notify:
+    - docker_enable
+    - docker_restart
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- shell: "firewall-cmd --zone=public --add-masquerade --permanent && \
+          firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 4 -i docker0 -j ACCEPT && \
+          service firewalld reload"
+  when: ansible_facts.services["firewalld.service"] is defined
+
+- name: import goss tests tasks
+  import_role:
+    name: goss_test

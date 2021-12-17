@@ -1,0 +1,109 @@
+# Firewall settings
+firewalld_port:
+  pop3:
+    port: 110
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  pop3-trusted:
+    port: 110
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  pop3s:
+    port: 995
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  pop3s-trusted:
+    port: 995
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  imap:
+    port: 143
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  imap-trusted:
+    port: 143
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  imaps:
+    port: 993
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  imaps-trusted:
+    port: 993
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  smtp:
+    port: 25
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  smtp-trusted:
+    port: 25
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  smtps:
+    port: 465
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  smtps-trusted:
+    port: 465
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  smtpd:
+    port: 587
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  smtpd-trusted:
+    port: 587
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+
+
+# Kubernetes Node's IPs
+frontend_k8s: [
+            { "name": "devopss_io_mailu_pop3", "port": 110, "k8s_port": 30110  },
+            { "name": "devopss_io_mailu_pop3s", "port": 995, "k8s_port": 30995 },
+            { "name": "devopss_io_mailu_imap", "port": 143, "k8s_port": 30143 },
+            { "name": "devopss_io_mailu_imaps", "port": 993, "k8s_port": 30993 },
+            { "name": "devopss_io_mailu_smtp", "port": 25, "k8s_port": 30025 },
+            { "name": "devopss_io_mailu_smtps", "port": 465, "k8s_port": 30465 },
+            { "name": "devopss_io_mailu_smtpd", "port": 587, "k8s_port": 30587  }
+          ]
+
+backend_k8s: [
+            {"backend_host": "k8sw01", "backend_ip": "10.1.1.93"},
+            {"backend_host": "k8sw02", "backend_ip": "10.1.1.96"},
+            {"backend_host": "k8sw03", "backend_ip": "10.1.1.98"},
+            {"backend_host": "k8sw04", "backend_ip": "10.1.1.5"},
+            {"backend_host": "k8sw05", "backend_ip": "10.1.1.123"},
+            {"backend_host": "k8sw06", "backend_ip": "10.1.1.108"},
+            {"backend_host": "k8sw07", "backend_ip": "10.1.1.64"},
+            {"backend_host": "k8sw08", "backend_ip": "10.1.1.35"}
+          ]

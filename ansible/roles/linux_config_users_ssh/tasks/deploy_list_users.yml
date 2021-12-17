@@ -1,0 +1,35 @@
+---
+- set_fact:
+    user_name_fact: "{{ item.value.name }}"
+    os_group_fact: "{{ item.value.osGroup }}"
+    user_status_fact: "{{ item.value.status }}"
+
+- file:
+    path: /home/{{ user_name_fact }}/.ssh/authorized_keys
+    state: absent
+
+- user:
+    name: "{{ user_name_fact }}"
+    expires: 1
+
+- name: Include Deploy Tasks for every user
+  include: deploy_list_hosts_users.yml
+  with_items: "{{ item.value.hosts.split(',') }}"
+  loop_control:
+    loop_var: user_host
+  when: user_status_fact == "active"
+
+- name: Disable non-active OS users {{ user_name_fact }}
+  user:
+    name: "{{ user_name_fact }}"
+    state: absent
+    expires: 1
+  register: remove_user
+  when: user_status_fact != "active"
+
+- name: Remove non-active ssh users key /home/{{ user_name_fact }}/.ssh/authorized_keys
+  file:
+    path: /home/{{ user_name_fact }}/.ssh/authorized_keys
+    state: absent
+  when: user_status_fact != "active"
+

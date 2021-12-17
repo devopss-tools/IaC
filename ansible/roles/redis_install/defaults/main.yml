@@ -1,0 +1,11 @@
+---
+redis_daemon: redis
+redis_state: started
+redis_enabled: true
+
+redis_version: "5.0.5"
+
+
+redis_rpm: "redis-{{ redis_version }}-1.el{{ ansible_distribution_major_version }}.remi.x86_64.rpm"
+redis_rpm_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{devopss_nexus_port}}/repository/raw-repository/redis/{{ redis_version }}/{{redis_rpm}}"
+

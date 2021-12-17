@@ -1,0 +1,37 @@
+---
+# pg_hba.conf
+- name: Deploy host based authentification for postgresql
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_config_pgdata }}/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: "0600"
+    backup: yes
+
+# postgresql.conf
+- name: Deploy configuration for postgresql
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ postgresql_config_pgdata }}/postgresql.conf"
+    owner: postgres
+    group: postgres
+    mode: "0600"
+    backup: yes
+
+- name: PostGreSQL -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 5432 will fail if mongod was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 5432
+    delay: 15
+    timeout: 60
+
+- import_role:
+      name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules

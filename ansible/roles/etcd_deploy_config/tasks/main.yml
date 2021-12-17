@@ -1,0 +1,84 @@
+---
+- name: Create certicates/etcd directory if it does not exist
+  local_action: "shell if [ ! -d {{ etcd_certificate_root_path }} ]; then mkdir -p {{ etcd_certificate_root_path }}; fi"
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: Create {{ ansible_currentHost_fact_hostname }}-csr.json configuration file
+  local_action: template src="etcd-csr.json.j2" dest="{{ etcd_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}-csr.json"
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: Generate ETCD certificate and private key
+  local_action: "shell {{ binaries_root_path }}/cfssl gencert -ca={{ ca_certificate_file }} \
+                                    -ca-key={{ ca_key_path }} \
+                                    -config={{ certificate_config }} \
+                                    -profile=kubernetes \
+                                    {{ etcd_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ etcd_certificate_root_path }}/etcd"
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: Create a users etcd grout
+  group:
+    name: etcd
+    state: present
+
+- name: Add etcd user to etcd group
+  user:
+    name: etcd
+    shell: /bin/bash
+    groups: etcd
+    append: yes
+    state: present
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: etcd
+    group: etcd
+    recurse: yes
+  with_items:
+     - "/home/etcd"
+     - "{{ etcd_config_dir }}"
+     - "{{ etcd_config_datadir }}"
+     - "{{ etcd_config_waldir }}"
+
+- name: Copy etcd certificates
+  copy:
+    src: "{{ item }}"
+    dest: /etc/etcd/
+    owner: root
+    mode: 600
+  with_items:
+     - "{{ etcd_certificate_root_path }}/etcd.pem"
+     - "{{ etcd_certificate_root_path }}/etcd-key.pem"
+     - "{{ ca_certificate_root_path }}/ca.pem"
+
+
+- name: copy etcd.config from templates
+  template:
+    src: etcd.conf.j2
+    dest: "{{ etcd_config_file }}"
+    owner: etcd
+    group: etcd
+    mode: "0600"
+    backup: yes
+  notify:
+    - etcd_restart
+
+- name: Copy etcd.service from templates
+  template:
+    src: etcd.service.j2
+    dest: "/etc/systemd/system/etcd.service"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+  notify:
+    - etcd_restart
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import goss test role
+  import_role:
+    name: goss_test

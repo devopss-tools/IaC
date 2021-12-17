@@ -1,0 +1,74 @@
+
+---
+- name: Set user name fact
+  set_fact:
+    namespace_fact: "{{ item.value.name }}"
+    user_name_fact: "{{ item.value.userName }}"
+    role_fact: "{{ item.value.role }}"
+    user_status_fact: "{{ item.value.status }}"
+  tags: manage_namespaces
+
+- name: Check if User {{ user_name_fact }} exist certificates
+  local_action: "shell if [ ! -f {{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}.kubeconfig ]; then
+                          echo 'Does not find file':' {{ k8s_access_roles_dir }}/{{ user_name_fact }}/{{ user_name_fact }}.kubeconfig';
+                          mkdir -pv {{ k8s_access_roles_dir }}/{{ namespace_fact }};
+                       fi"
+  register: result
+  tags: manage_namespaces
+
+- debug:
+    msg: "{{ result.stdout }}"
+  when: result.stdout != ""
+  tags: manage_namespaces
+
+- name: Create user {{ user_name_fact }} Configuration csr file
+  local_action: "template src=user-csr.json.j2 dest={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}-csr.json"
+  when: result.stdout != ""
+  tags: manage_namespaces
+
+
+- name: Generate kubernetes {{ user_name_fact }} certificate and access key
+  local_action: "shell {{ binaries_root_path }}/cfssl gencert -ca={{ ca_certificate_file_target }} \
+                                    -ca-key={{ ca_key_path_target }} \
+                                    -config={{ certificate_config }} \
+                                    -profile=kubernetes \
+                                    {{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}"
+  when: result.stdout != ""
+  tags: manage_namespaces
+
+
+- name: Kubectl - Configure access to cluster from localhost
+  local_action: "shell kubectl config set-cluster kubernetes \
+                                    --server=https://{{ hostvars[groups['k8s-master-group'][0]].ansible_host }}:6443 \
+                                    --embed-certs=true \
+                                    --certificate-authority={{ ca_certificate_file_target }} \
+                                    --kubeconfig={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}.kubeconfig"
+  when: result.stdout != ""
+  tags: manage_namespaces
+
+
+- name: Kubectl - Set credentials for access cluster {{ user_name_fact }}
+  local_action: "shell kubectl config set-credentials {{ user_name_fact }} \
+                                    --embed-certs=true \
+                                    --client-certificate={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}.pem \
+                                    --client-key={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}-key.pem \
+                                    --kubeconfig={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}.kubeconfig"
+  when: result.stdout != ""
+  tags: manage_namespaces
+
+
+- name: Kubectl - Set context {{ user_name_fact }}
+  local_action: "shell kubectl config set-context {{ user_name_fact }}-context \
+                                    --cluster=kubernetes \
+                                    --user={{ user_name_fact }} \
+                                    --namespace={{ namespace_fact }} \
+                                    --kubeconfig={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}.kubeconfig"
+  when: result.stdout != ""
+  tags: manage_namespaces
+
+- name: Kubectl - Set use context {{ user_name_fact }}
+  local_action: "shell kubectl config use-context {{ user_name_fact }}-context \
+                                    --kubeconfig={{ k8s_access_roles_dir }}/{{ namespace_fact }}/{{ user_name_fact }}.kubeconfig"
+  when: result.stdout != ""
+  tags: manage_namespaces
+

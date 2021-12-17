@@ -1,0 +1,122 @@
+- name: MONITORING':' Kibana general preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/monitoring/kibana-general.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: kibana-general
+
+- name: MONITORING':' Kibana preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/monitoring/kibana.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: monitoring-kibana
+
+- name: MONITORING':' HeartBeat Preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/monitoring/heartbeat.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: monitoring-heartbeat
+
+- name: MONITORING':' Filebeat preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/monitoring/filebeat.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: monitoring-filebeat
+
+- name: Ingress Controller':' Preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/ingressController/ingress-controller.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: ingress-controller
+
+- name: devopss.io Ingress objects':' Preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/devopss-platform/devopss-io-ingress.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: devopss-io-ingress
+  when: env_name == "datacenter"
+
+- name: NFS Client Provisioner':' Preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/nfs-client-provisioner/nfs-client-provisioner.yaml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: nfs-client-provisioner
+  when: env_name != "datacenter"
+
+- name: NFS Client Provisioner':' Preapare k8s deployment file
+  template:
+    src: "{{ role_path }}/files/nfs-client-provisioner/devopssprod-nfs-client-provisioner.yaml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: nfs-client-provisioner
+  when: env_name == "datacenter"
+
+- name: K8s Dashboard ':' Preapare  k8s deployment file
+  template:
+    src: "{{ role_path }}/files/k8s-dashboard/dashboard-{{k8s_dashboard_version}}.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: k8s-dashboard
+
+- name: KOPF Plugin for ES':' Preapare  k8s deployment file
+  template:
+    src: "{{ role_path }}/files/kopf-forES/kopf.yml"
+    dest: "{{ role_path }}/files/deployment.yml"
+  tags: kopf
+
+- name: Prepare {{env_name}} admin.kubeconfig
+  template:
+    src: "{{ certificates_root_path }}/k8s_access_roles/kubeadmin/admin.kubeconfig"
+    dest: "{{ ansible_root_path }}/../target/admin.kubeconfig"
+  tags: [ monitoring-kibana, monitoring-heartbeat, kopf, k8s-dashboard, monitoring-filebeat, ingress-controller, nfs-client-provisioner, kibana-general, devopss-io-ingress ]
+
+- name: Mailu K8s Stack Deploy
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ role_path }}/files/mailu-tmp/"
+  with_filetree: '{{ role_path }}/files/mailu/'
+  tags: [ mailu-server ]
+
+- name: Apply k8s deployment file
+  k8s:
+    kubeconfig: "{{ kubeadmin_dir }}/admin.kubeconfig"
+    state: present
+    definition: "{{ lookup('file', 'deployment.yml') }}"
+    validate:
+      fail_on_error: yes
+  register: k8s_deploy_result
+  tags: [ monitoring-kibana, monitoring-heartbeat, kopf, k8s-dashboard, monitoring-filebeat, ingress-controller, nfs-client-provisioner, kibana-general, devopss-io-ingress ]
+
+#- debug:
+#    msg: "{{ item.src }}"
+#  with_filetree: '{{ role_path }}/files/mailu/'
+#  tags: [ mailu-server ]
+
+- name: Apply k8s deployment file
+  k8s:
+    kubeconfig: "{{ kubeadmin_dir }}/admin.kubeconfig"
+    state: present
+    definition: "{{ lookup('file', '{{ item.src }}') }}"
+    validate:
+      fail_on_error: yes
+  with_filetree: '{{ role_path }}/files/mailu-tmp/'
+  register: k8s_deploy_result
+  tags: [ mailu-server ]
+
+- name: Remove deployment.yml file
+  file:
+    path: "{{ role_path }}/files/deployment.yml"
+    state: absent
+  tags: [ monitoring-kibana, monitoring-heartbeat, kopf, k8s-dashboard, monitoring-filebeat, ingress-controller, nfs-client-provisioner, kibana-general, devopss-io-ingress ]
+
+- name: Remove deployment.yml file
+  file:
+    path: "{{ role_path }}/files/mailu-tmp/"
+    state: absent
+  tags: [ mailu-server ]
+
+- name: Apply HeartBeat rules files
+  include: heatbeat-rules.yml
+  tags: "monitoring-heartbeat-rules"
+
+#- name: K8s Deployment Result
+#  debug:
+#    msg: "{{ k8s_deploy_result }}"
+#  tags: [ monitoring, monitoring-heartbeat, kopf, k8s-dashboard ]

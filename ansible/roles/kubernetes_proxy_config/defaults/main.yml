@@ -1,0 +1,5 @@
+---
+cluster_cidr: "{{ container_network_config_pod_cidr }}"
+certificate_root_path: "./{{ certificates_root_path }}/k8s"
+goss_test_files: ["kube-proxy.yml"]
+monit_rules_files: ["kube-proxy.monit"]

@@ -1,0 +1,4 @@
+---
+mongodb_deploy_version_major : "4"
+mongodb_deploy_version_minor : "0"
+mongodb_deploy_version_build : "20"

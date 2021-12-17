@@ -1,0 +1,4 @@
+---
+- name: yum install repo "{{ item.name }}"
+  shell: yum-config-manager --add-repo "{{ item.url }}"
+  with_items: "{{ repo }}"

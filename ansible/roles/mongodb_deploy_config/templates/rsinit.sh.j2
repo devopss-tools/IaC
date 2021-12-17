@@ -1,0 +1,6 @@
+#!/bin/bash
+{% if ansible_currentHost_fact_ip == hostvars[groups['mongodb-devopss-io-group'][0]].ansible_host %}
+echo " ==========  Replica Set Initiate ========== "
+mongo --host {{ansible_currentHost_fact_ip}}  --eval \
+" rs.initiate( { _id : '{{ mongodb_deploy_config_replica_name }}', members: [ { _id: 0, host: '{{hostvars[groups['mongodb-devopss-io-group'][0]].ansible_host}}' } ] });  rs.conf() "
+{% endif %}

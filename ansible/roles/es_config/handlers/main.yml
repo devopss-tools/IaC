@@ -1,0 +1,10 @@
+- name: es_restart
+  systemd:
+    name: elasticsearch
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+
+- name: ES {{ es_version }} -  Sleep for 30 seconds and continue with play
+  wait_for:
+    timeout: 30

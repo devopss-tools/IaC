@@ -1,0 +1,75 @@
+- name: Add mysql group
+  group:
+    name: mysql
+    state: present
+
+- name: Add mysql user
+  user:
+    name: mysql
+    shell: /bin/bash
+    groups: mysql
+    append: yes
+    state: present
+
+- name: Create directory "{{ mysql_dir }}"
+  file:
+    path: "{{ mysql_dir }}"
+    state: directory
+    mode: 0777
+    owner: mysql
+    group: mysql
+
+- name: Copy my.cnf file
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: mysql
+    group: mysql
+    mode: "0644"
+
+- name: Copy root-my.cnf file
+  template:
+    src: root-my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: MySql -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Create symblink /var/lib/mysql/mysql.sock
+  file:
+    src: "{{ mysql_dir }}/mysql.sock"
+    dest: /var/lib/mysql/mysql.sock
+    owner: mysql
+    group: mysql
+    state: link
+
+- name: Check if the service is running on port 3306 will fail if MySql was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 3306
+    delay: 5
+    timeout: 60
+
+- name: Create myadmin user, reset root temp password and create mysql db
+  include_tasks: databases_and_users.yml
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+    ansible_pip_interpreter: "/usr/bin/pip3"
+
+- name: Create databases and users
+  include_tasks: databases_and_users.yml
+
+
+- name: MySql -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import goss test role
+  import_role:
+    name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules

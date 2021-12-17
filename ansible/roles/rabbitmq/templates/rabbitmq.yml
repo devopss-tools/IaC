@@ -1,0 +1,4 @@
+service:
+  {{rabbitmq_daemon}}:
+    enabled: true
+    running: true

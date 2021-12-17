@@ -1,0 +1,22 @@
+service:
+  docker:
+    enabled: true
+    running: true
+
+command:
+#Test Client docker version
+  /bin/docker --version:
+    stdout:
+      - {{ docker_version }}
+    exit-status: 0
+    timeout: 1000
+#Test Server Docker Engine version
+  /bin/dockerd --version:
+    stdout:
+      - {{ docker_version }}
+    exit-status: 0
+    timeout: 1000
+#Test Running Alpine container
+  /bin/docker run -itd --name test --rm alpine sh -c "sleep 1" && /bin/docker wait test:
+    exit-status: 0
+    timeout: 100000

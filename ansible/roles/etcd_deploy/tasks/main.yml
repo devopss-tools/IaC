@@ -1,0 +1,20 @@
+---
+# Download etcd
+- name: Download etcd
+  unarchive:
+    src: "{{ etcd_install_url }}"
+    dest: "/tmp/"
+    remote_src: yes
+
+# copy etcd
+- name: Copy etcd
+  copy:
+    src: "{{ item }}"
+    dest: "{{ etcd_install_bin_path }}"
+    mode: "0755"
+    owner: root
+    group: root
+    remote_src: True
+  with_items:
+     - "{{ etcd_install_tmp_etcd_path }}"
+     - "{{ etcd_install_tmp_etcdctl_path }}"

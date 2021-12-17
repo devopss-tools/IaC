@@ -1,0 +1,4 @@
+- name: deploy firewall service and rules
+  become: true
+  roles:
+    - firewalld

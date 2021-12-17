@@ -1,0 +1,16 @@
+---
+- name: deploy GitLab Runner's master
+  become: true
+  hosts: gitlab-runners-group
+  roles:
+    - { role: package,
+             pkgs:
+                [
+                  "python3-pip", "python2-pip", "libselinux-python3", "libselinux-python2",
+                  "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/gitlab/runner/{{ gitlab_runner_version }}/gitlab-runner_amd64.rpm"
+                ],
+              tags: [ "gitlab_runner_deploy"]
+      }
+    - { role: package, pip_pkgs: [ "docker", "docker-py" ],  tags: [ "gitlab_runner_deploy"] }
+    - { role: gitlab_runner_config, tags: [ "gitlab_runner_config"], ansible_python_interpreter: "/usr/bin/python3", ansible_pip_interpreter: "/usr/bin/pip3" }
+

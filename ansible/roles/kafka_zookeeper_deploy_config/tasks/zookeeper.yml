@@ -1,0 +1,100 @@
+---
+# add zookeeper group
+- group:
+    name: "{{ kafka_os_group }}"
+    state: present
+
+# Add zookeeper user
+- user:
+    name: "{{ kafka_os_user }}"
+    shell: /bin/bash
+    groups: "{{ kafka_os_group }}"
+    append: yes
+    state: present
+
+# create a directory if it doesn"t exist
+- file:
+    path: "/home/{{ kafka_os_user }}"
+    state: directory
+    mode: 0755
+    owner: "{{ kafka_os_user }}"
+    group: "{{ kafka_os_group }}"
+
+
+- name: Create Kafka / ZooKeeper data and log directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ kafka_os_user }}"
+    group: "{{ kafka_os_group }}"
+    mode: 0755
+    recurse: yes
+  with_items:
+    - "{{ zk_home }}"
+    - "{{ zk_home }}/config"
+    - "{{ zk_datadir }}"
+    - "{{ zk_waldir }}"
+    - "{{ zk_logs }}"
+    - "{{ kafka_log_dir }}"
+
+
+#- name: Configure zoo.cfg
+#  template:
+#    src: zoo_sample.cfg.j2
+#    dest: "{{ zk_home }}/config/zoo.cfg"
+
+- name: Configure log4j.properties
+  template:
+    src: log4j.properties.j2
+    dest: "{{ zk_home }}/config/log4j.properties"
+  notify:
+    - zookeeper_restart
+  when: kafka_hosts_group_name != ''
+
+
+- name: Configure myid for "{{ kafka_hosts_group_name }}"
+  template:
+    src: "{{ kafka_hosts_group_name }}/myid.j2"
+    dest: "{{ zk_datadir }}/myid"
+    owner: "{{ kafka_os_user }}"
+    group: "{{ kafka_os_group }}"
+  when: kafka_hosts_group_name != ''
+#
+#- name: Configure myid for kafka-test-group
+#  template:
+#    src: kafka-test-group/myid.j2
+#    dest: "{{ zk_datadir }}/myid"
+#  when: kafka_hosts_group_name == 'kafka-test-group'
+
+- name: Systemd script.
+  template:
+    src: zookeeper.service.j2
+    dest: "/etc/systemd/system/zookeeper.service"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+#  when: ansible_service_mgr == 'systemd'
+#  notify:
+#    - systemd_reload
+#    - zookeeper_enable
+#    - zookeeper_restart
+
+- name: Configure zookeeper.properties for kafka-group
+  template:
+    src: "{{ kafka_hosts_group_name }}/zookeeper.properties.j2"
+    dest: "{{ zk_home }}/config/zookeeper.properties"
+#  when: kafka_hosts_group_name == 'kafka-group'
+  when: kafka_hosts_group_name != ''
+#
+#- name: Configure zookeeper.properties for kafka-test-group
+#  template:
+#    src: kafka-test-group/zookeeper.properties.j2
+#    dest: "{{ zk_home }}/config/zookeeper.properties"
+#  when: kafka_hosts_group_name == 'kafka-group'
+
+- name: Configure zookeeper_jaas.conf
+  template:
+    src: zookeeper_jaas.conf.j2
+    dest: "{{ zk_home }}/config/zookeeper_jaas.conf"
+  when: kafka_auth is defined

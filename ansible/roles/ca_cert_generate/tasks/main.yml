@@ -1,0 +1,29 @@
+---
+- name: check  ca_certificate_root_path  directory
+  local_action: "shell if [ -f {{ ca_certificate_root_path }} ]; then \
+                 echo CA Directory exists; \
+                 else mkdir -pv {{ ca_certificate_root_path }};  fi "
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: check directories
+  local_action: "shell if [ -f {{ ca_certificate_file }} ] && [ -f {{ ca_key_path }} ]; then echo CA files exist; fi "
+  register: result
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: copy ca-csr.json.j2 file
+  local_action: template src="ca-csr.json.j2" dest="{{ ca_certificate_root_path }}/ca-csr.json"
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: copy ca-config.json.j2 file
+  local_action: template src="ca-config.json.j2" dest="{{ ca_certificate_root_path }}/ca-config.json"
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+
+- name: generate Certificate Authority (CA) files
+  local_action: "shell if [ ! -f {{ ca_certificate_file }} ] && [ ! -f {{ ca_key_path }} ]; then
+                 {{ binaries_root_path }}/cfssl gencert -initca {{ ca_certificate_root_path }}/ca-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ ca_certificate_root_path }}/ca \
+                 else echo 'Files ca.pem and ce-key.pem exist in directory {{ ca_certificate_root_path }}'; fi "
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+

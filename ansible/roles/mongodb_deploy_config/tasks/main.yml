@@ -1,0 +1,65 @@
+---
+- name: Set dir permision permissions
+  file:
+    dest=/var/lib/mongodb
+    state=directory
+    owner=mongod
+    group=mongod
+    mode=0775
+    recurse=yes
+
+# mongod config
+- name: mongod conf
+  template:
+    src: mongod.conf.j2
+    dest: /etc/mongod.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+# Disable SELinux
+- selinux:
+    state: disabled
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 27017 will fail if mongod was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 27017
+    delay: 15
+    timeout: 60
+
+- name: Copy Replica Set Initiate script file
+  template:
+    src: rsinit.sh.j2
+    dest: /tmp/rsinit.sh
+    mode: "0755"
+  delegate_to: "{{hostvars[groups['mongodb-group'][0]].ansible_host}}"
+  run_once: true
+
+- name: Run Replica Set Initiate
+  command: /tmp/rsinit.sh
+  register: rs_init_result
+  delegate_to: "{{hostvars[groups['mongodb-group'][0]].ansible_host}}"
+  run_once: true
+
+- name: Wait Replica Set Initiating
+  wait_for:
+    timeout: 15
+
+- name: Check if the service is running on port 27017 will fail if mongod was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 27017
+    delay: 15
+    timeout: 60
+
+- name: import goss test role
+  import_role:
+    name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules

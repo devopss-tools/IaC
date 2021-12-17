@@ -1,0 +1,5 @@
+---
+etcd_install_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repositories/etcd/etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+etcd_install_tmp_etcd_path: "/tmp/etcd-{{ etcd_version }}-linux-amd64/etcd"
+etcd_install_tmp_etcdctl_path: "/tmp/etcd-{{ etcd_version }}-linux-amd64/etcdctl"
+etcd_install_bin_path: "/usr/local/sbin"

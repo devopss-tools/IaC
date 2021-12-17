@@ -1,0 +1,19 @@
+---
+- name: haproxy_enable
+  service:
+    name: haproxy
+    enabled: yes
+
+# restart haproxy service
+- name: haproxy_reload
+  service:
+    name: haproxy
+    state: reloaded
+
+## enable haproxy service
+#- name: haproxy service restart
+#  service:
+#    name: haproxy
+#    state: restarted
+
+

@@ -1,0 +1,39 @@
+# version 0.2
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+#After=cri-containerd.service
+#Requires=cri-containerd.service
+
+[Service]
+User=root
+ExecStart=/usr/local/sbin/kubelet \
+  --address {{ ansible_currentHost_fact_ip }} \
+  --hostname-override {{ ansible_currentHost_fact_hostname }} \
+  --authorization-mode=Webhook \
+  --container-runtime=docker \
+  --image-pull-progress-deadline=2m \
+  --kubeconfig=/var/lib/kubernetes/kubelet/kubeconfig \
+  --network-plugin=cni \
+  --pod-cidr={{ kubelet_config_pod_cidr }} \
+  --register-node=true \
+  --fail-swap-on=false \
+  --runtime-request-timeout=15m \
+  --resolv-conf=/etc/resolv.conf \
+  --client-ca-file=/var/lib/kubernetes/kubelet/ca.pem \
+  --tls-cert-file=/var/lib/kubernetes/kubelet/{{ ansible_currentHost_fact_hostname }}.pem \
+  --tls-private-key-file=/var/lib/kubernetes/kubelet/{{ ansible_currentHost_fact_hostname }}-key.pem \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+#  --anonymous-auth=true \
+
+
+# following parameters deprecated on kubernetes from version v1.13:
+#  --allow-privileged=true \
+
+#  --container-runtime-endpoint=unix:///var/run/cri-containerd.sock \

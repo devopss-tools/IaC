@@ -1,0 +1,19 @@
+---
+- name: Deploy containers to kubernetes
+  become: true
+  hosts:
+    - filebeat-group
+    - es-monitoring-group
+    - k8s-worker-group
+    - test-group
+
+  roles:
+    - { role: package, pkgs: ['telnet', 'nano', 'net-tools'], tags: [ "filebeat_install"] }
+    - { role: package,
+             pkgs:
+                [
+                  "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/monitoring/filebeat/{{ filebeat_version }}/filebeat-{{ filebeat_version }}-x86_64.rpm"
+                ],
+              tags: [ "filebeat_install"]
+      }
+    - { role: monitoring_filebeat_deploy, tags: [ "filebeat_config"] }

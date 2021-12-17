@@ -1,0 +1,23 @@
+linux_filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/redis"} ]
+
+redis_storage_dir: "/var/lib/redis/redis"
+
+firewalld_port:
+  redis:
+    port: 6379
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  redis-trusted:
+    port: 6379
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  redis-internal:
+    port: 6379
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true

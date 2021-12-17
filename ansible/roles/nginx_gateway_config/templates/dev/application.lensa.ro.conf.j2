@@ -1,0 +1,50 @@
+upstream {{ app_lensa.domain }} {
+    least_conn;
+    {% for host in groups['k8s-worker-group'] %} server {{ hostvars[host]['ansible_host']}}:{{ app_lensa.port }};
+    {% endfor %}
+}
+
+upstream media.{{ app_lensa.domain }} {
+    least_conn;
+    {% for host in groups['k8s-worker-group'] %} server {{ hostvars[host]['ansible_host']}}:{{ app_lensa.media_service_port }};
+    {% endfor %}
+}
+
+server {
+    client_max_body_size 500M;
+    server_name {{ app_lensa.domain }};
+    location /mediafiles {
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Real-Ip $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        if (!-f $request_filename) {
+            proxy_pass http://media.{{ app_lensa.domain }};
+            break;
+        }
+    }
+    location / {
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Real-Ip $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        if (!-f $request_filename) {
+            proxy_pass http://{{ app_lensa.domain }};
+            break;
+        }
+    }
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/{{ app_lensa.domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ app_lensa.domain }}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = {{ app_lensa.domain }}) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+    server_name {{ app_lensa.domain }};
+    listen 80;
+    return 404;
+}

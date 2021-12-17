@@ -1,0 +1,19 @@
+---
+- name: basic linux configuration
+  become: true
+  hosts: all
+  roles:
+    - { role: package, pkgs: ["epel-release", "libselinux-python","policycoreutils-python", "yum-utils", "ntp", "nfs-utils", "nano", "telnet", "net-tools", "wget"] }
+    - { role: package, pkgs: [ "monit" ] }
+    - { role: linux_config_ntp }
+    - { role: linux_config_users_ssh }
+    - { role: linux_config_ssh }
+    - { role: linux_config_goss }
+    - { role: linux_config_net }
+    - { role: linux_filesystem }
+    - { role: linux_config_trusted_ca_certs, tags: "trusted_deploy" }
+    - { role: selinux_status }
+    - { role: firewalld }
+    - { role: monit_config_deploy }
+    - { role: selinux_status }
+

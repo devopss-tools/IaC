@@ -1,0 +1,32 @@
+---
+- name: Deploy ZooKeeper
+  include: zookeeper.yml
+
+- name: Deploy Kafka
+  include: kafka.yml
+
+# Enable/Restart services
+- name: Enable / Restart services
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 2181 will fail if ZooKeeper was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 2181
+    delay: 5
+    timeout: 60
+
+- name: Check if the service is running on port 9092 will fail if kafka was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 9092
+    delay: 5
+    timeout: 120
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules
+
+- name: Import role Goss Test
+  import_role:
+    name: goss_test

@@ -1,0 +1,8 @@
+linux_filesystem_map: [
+  {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/docker"}
+]
+
+docker_version: "19.03.9"
+
+akeneo_prim_servername: "akeneo.devopss.net"
+akeneo_prim_url: "http://{{ akeneo_prim_servername }}"

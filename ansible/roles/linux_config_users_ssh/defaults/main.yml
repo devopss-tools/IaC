@@ -1,0 +1,5 @@
+---
+linux_config_deploy_user_name: "deploy"
+linux_config_deploy_group_name: "deploy"
+repo_pub_ssh_keys: "{{ ansible_root_path }}/ACL/common/pub_ssh_keys"
+repo_role_pub_ssh_keys: "{{ playbook_dir }}/roles/common/linux_config_users_ssh/pub_ssh_key"

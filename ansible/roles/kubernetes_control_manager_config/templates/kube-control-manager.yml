@@ -1,0 +1,19 @@
+service:
+  kube-control-manager:
+    enabled: true
+    running: true
+
+command:
+#Test kube-controller-manager version
+  /usr/local/sbin/kube-controller-manager --version:
+    stdout:
+      - {{ k8s_version }}
+    exit-status: 0
+    timeout: 1000
+
+#Test kube-controller-manager health on http
+  /bin/curl http://127.0.0.1:10252/healthz:
+    stdout:
+      - ok
+    exit-status: 0
+    timeout: 1000

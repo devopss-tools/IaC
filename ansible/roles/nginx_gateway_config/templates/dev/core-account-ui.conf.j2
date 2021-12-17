@@ -1,0 +1,34 @@
+upstream {{ core_account_ui.domain }} {
+     least_conn;
+     {% for var in upstream %}  server   {{ var.k8s_Ingress_Controller_Host }};
+     {% endfor %}
+    }
+
+server {
+    server_name {{ core_account_ui.domain }}  www.{{ core_account_ui.domain }};
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        if (!-f $request_filename) {
+            proxy_pass http://{{ core_account_ui.domain }} ;
+            break;
+        }
+        add_header Set-Cookie cip=$remote_addr;
+        add_header Set-Cookie chost=$Host;
+    }
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/{{ core_account_ui.domain }}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/{{ core_account_ui.domain }}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = {{ core_account_ui.domain }}) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+    server_name {{ core_account_ui.domain }}  www.{{ core_account_ui.domain }};
+    listen 80;
+    return 404; # managed by Certbot
+}

@@ -1,0 +1,23 @@
+# hosts - list of hosts (ansible_host=..., see file hosts) comma separated. Ex:>  hosts: "10.1.1.43,10.1.1.44,kafka-com-01.test.internal"
+users:
+  ionaremescu:
+    name: ionaremescu
+    osGroup: deploy
+    hosts: ""
+    status: active
+  danudumbraveanu:
+    name: danudumbraveanu
+    osGroup: deploy
+    hosts: ""
+    status: active
+  dmitribortnic:
+    name: dmitribortnic
+    osGroup: deploy
+    hosts: ""
+    status: active
+  eduardgolan:
+    name: eduardgolan
+    osGroup: deploy
+    hosts: "10.1.1.49,10.1.1.115,10.1.1.15,10.1.1.17,10.1.1.22"
+    status: active
+#### inactive users

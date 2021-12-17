@@ -1,0 +1,36 @@
+---
+- name: Copy filebeat.yml
+  template:
+    src: filebeat.yml.j2
+    dest: "/etc/filebeat/filebeat.yml"
+    owner: root
+    group: root
+    mode: "0755"
+    backup: yes
+
+#- name: Remove inputs rules directory
+#  file:
+#    path: "/etc/filebeat/inputs.d"
+#    state: absent
+
+- name: Create inputs rules directory
+  file:
+    path: "/etc/filebeat/inputs.d"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Copy inputs rules files
+  template:
+    src: "{{ item }}.yml.j2"
+    dest: "/etc/filebeat/inputs.d/{{ item }}.yml"
+  with_items:
+     - "{{ fileabet_inputs }}"
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import goss test role
+  import_role:
+    name: goss_test

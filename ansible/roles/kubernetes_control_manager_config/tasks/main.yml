@@ -1,0 +1,38 @@
+---
+- name: Add kubecontrolm group
+  group:
+    name: kubecontrolm
+    state: present
+
+- name: Add kubecontrolm user
+  user:
+    name: kubecontrolm
+    shell: /bin/bash
+    groups: kubecontrolm
+    append: yes
+    state: present
+
+- name: Create a directory if it doesn"t exist
+  file:
+    path: "/home/kubecontrolm"
+    state: directory
+    mode: 0755
+    owner: kubecontrolm
+    group: kubecontrolm
+
+- name: Copy kube-control-manager service file
+  template:
+    src: kube-control-manager.service.j2
+    dest: "/etc/systemd/system/kube-control-manager.service"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import goss tests tasks
+  import_role:
+    name: goss_test
+  tags: "k8smaster_goss_tests"

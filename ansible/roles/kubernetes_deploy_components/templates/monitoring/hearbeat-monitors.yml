@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media
+spec:
+  selector:
+    matchLabels:
+      app: media
+  replicas: 12
+  template:
+    metadata:
+      labels:
+        app: media
+    spec:
+      containers:
+      - name: media-app
+        image: 773352361422.dkr.ecr.eu-west-1.amazonaws.com/eks-media-api-registry:1.0.54
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        envFrom:
+          - configMapRef:
+              name: media-configmap
+        resources:
+          limits:
+            memory: "440Mi"
+          requests:
+            memory: "400Mi"
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /media/
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /media/
+            port: 8000
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30

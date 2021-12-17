@@ -1,0 +1,8 @@
+gitlab_runner_version: "13.11.0"
+docker_version: "19.03.9"
+gitlab_docker_registry_url: "gitlab.com"
+gitlab_docker_registry_port: "4567"
+gitlab_docker_registry_user: "gladmin-image-registry-token"
+gitlab_docker_registry_user_token: "{{ vault_gitlab_docker_registry_token }}"
+gitlab_runners_registration_token: "{{ vault_gitlab_runners_registration_token }}"
+gitlab_runner_docker_image: "{{ gitlab_docker_registry_url }}:{{ gitlab_docker_registry_port }}/devopss-iaas/k8s-deployment:docker-18-git"

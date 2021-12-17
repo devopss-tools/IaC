@@ -1,0 +1,16 @@
+
+
+# Setup/install tasks.
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure redis is started and enabled (if configured).
+  service:
+    name: "{{ redis_daemon }}"
+    state: "{{ redis_state }}"
+    enabled: "{{ redis_enabled }}"
+
+

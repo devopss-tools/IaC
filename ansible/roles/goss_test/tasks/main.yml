@@ -1,0 +1,19 @@
+---
+- name: Deploy goss tests {{ goss_test_files }}
+  template:
+    src: "{{ item }}"
+    dest: /etc/goss.d/
+    owner: root
+    group: root
+    mode: "0644"
+  with_items: "{{ goss_test_files }}"
+
+- name: Run goss tests {{ goss_test_files }}
+  command: /usr/local/sbin/goss --gossfile /etc/goss.d/"{{ item | basename | regex_replace('\.j2','.yml') }}" validate --format tap
+  register: run_goss_result
+  with_items: "{{ goss_test_files }}"
+
+- name: Result of goss tests {{ goss_test_files }}
+  debug:
+    msg: "{{ run_goss_result.results.0.stdout_lines }}"
+

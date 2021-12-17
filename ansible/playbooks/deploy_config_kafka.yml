@@ -1,0 +1,11 @@
+---
+- name: deploy kafka cluster
+  become: true
+  hosts: kafka-group
+  roles:
+     Install java kafka-group
+    - { role: jdk_oracle_deploy, tags: [ "kafka_deploy"] }
+    - { role: package, pkgs: ["nc"] , tags: [ "kafka_deploy"] }
+     Install kafka deploy kafka-group
+    - { role: kafka_deploy, tags: [ "kafka_deploy"] }
+    - { role: kafka_zookeeper_deploy_config, tags: [ "kafka_config"] }

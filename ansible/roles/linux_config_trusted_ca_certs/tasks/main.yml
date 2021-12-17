@@ -1,0 +1,10 @@
+---
+- name: add trusted CA certificates 
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/pki/ca-trust/source/anchors/"
+  with_fileglob:
+    - "trusted_ca_certs/*"
+
+- name: update trusted CA certs
+  shell: update-ca-trust extract

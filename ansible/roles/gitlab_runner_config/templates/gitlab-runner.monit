@@ -1,0 +1,6 @@
+check program nfs-goss-tests with path "/bin/systemctl status gitlab-runner.service"
+  with timeout 10 seconds
+  start program = "/bin/systemctl start gitlab-runner" with timeout 60 seconds
+  stop program = "/bin/systemctl stop gitlab-runner"
+  if status != 0 then exec "/etc/monit.d/monit2telegram"  repeat every 3 cycles
+  if status != 0 then restart every 5 cycles

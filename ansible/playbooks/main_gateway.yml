@@ -1,0 +1,8 @@
+---
+- name: Deploy gateway Server
+  become: true
+  hosts: gateway-group
+  roles:
+    - { role: package, pkgs: ['http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm'],  tags: [ "gateway_deploy"]}
+    - { role: package, pkgs: ['nginx'],  tags: [ "gateway_deploy"]}
+    - { role: nginx_gateway_config, tags: [ "gateway_config"]}

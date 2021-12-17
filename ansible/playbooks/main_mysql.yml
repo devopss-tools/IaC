@@ -1,0 +1,17 @@
+---
+- name: deploy mysql server
+  become: true
+  hosts: mysql-group
+  roles:
+    # deploy mysql
+    - { role: package, pkgs: [ "python3"],  tags: [ "mysql_install"] }
+    - { role: package, pip_pkgs: [ "setuptools", "wheel", "setuptools-rust", "cryptography<=3", "pymysql", "PyMySQL"],  tags: [ "mysql_install"], ansible_python_interpreter: "/usr/bin/python3", ansible_pip_interpreter: "/usr/bin/pip3" }
+    - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/mysql/{{mysql_version}}/mysql80-community-release-el7-3.noarch.rpm'],  tags: [ "mysql_install"]}
+    - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/mysql/{{mysql_version}}/mysql-community-common-{{mysql_version}}-1.el7.x86_64.rpm'],  tags: [ "mysql_install"]}
+    - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/mysql/{{mysql_version}}/mysql-community-libs-{{mysql_version}}-1.el7.x86_64.rpm'],  tags: [ "mysql_install"]}
+    - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/mysql/{{mysql_version}}/mysql-community-libs-compat-{{mysql_version}}-1.el7.x86_64.rpm'],  tags: [ "mysql_install"]}
+    - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/mysql/{{mysql_version}}/mysql-community-client-{{mysql_version}}-1.el7.x86_64.rpm'],  tags: [ "mysql_install"]}
+    - { role: package, pkgs: ['http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/mysql/{{mysql_version}}/mysql-community-server-{{mysql_version}}-1.el7.x86_64.rpm' ],  tags: [ "mysql_install" ] }
+    - { role: package, pkgs: [ "MySQL-python"],  tags: [ "mysql_install"] }
+    - { role: mysql_deploy, tags: [ "mysql_config"] }
+

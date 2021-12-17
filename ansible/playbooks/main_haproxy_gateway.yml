@@ -1,0 +1,7 @@
+---
+- name: Deploy HAProxy gateway Server
+  become: true
+  hosts: haproxy-gateway-group
+  roles:
+    - { role: package, pkgs: ['haproxy'],  tags: [ "haproxy_deploy"]}
+    - { role: haproxy_gateway_config, tags: [ "haproxy_config"]}

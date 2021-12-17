@@ -1,0 +1,7 @@
+---
+- name: Encryption and decryption_files
+  become: true
+  become_user: "{{ lookup('env','USER') }}"
+  hosts: localhost
+  roles:
+    - { role: encryption_decryption_files }

@@ -1,0 +1,9 @@
+---
+- name: deploy and confgure etcd
+  become: true
+  hosts:
+    - etcd-group
+  roles:
+    # Install etcd
+    - { role: etcd_deploy , tags: [ "etcd_deploy"] }
+    - { role: etcd_deploy_config , tags: [ "etcd_config"] }

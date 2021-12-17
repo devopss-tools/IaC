@@ -1,0 +1,65 @@
+- type: tcp
+  name: SSH 22 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['all'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [22]
+
+- type: tcp
+  name: PostGreSQL 5432 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['pgsql-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [5432]
+
+- type: tcp
+  name: K8S ETCD 2379 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['etcd-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [2379]
+
+- type: tcp
+  name: K8S API Server 6443 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['k8s-master-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [6443]
+
+- type: tcp
+  name: K8S Workers K-Proxy 10256 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['k8s-worker-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [10256]
+
+- type: tcp
+  name: ES 9200 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['elasticsearch-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [9200]
+
+- type: tcp
+  name: NFS 2049 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['nfs-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [2049]
+
+- type: tcp
+  name: Nginx 80 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['gateway-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [80]
+
+- type: tcp
+  name: Nginx 443 TCP port connection
+  schedule: '@every 60s'
+  hosts: [ {% for host in groups['gateway-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [443]
+
+- type: tcp
+  name: Kafka 9092 TCP port connection
+  schedule: '@every 60s'
+  hosts: [  {% for host in groups['kafka-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [9092]
+
+- type: tcp
+  name: ZooKeeper 2181 TCP port connection
+  schedule: '@every 60s'
+  hosts: [  {% for host in groups['zk-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %} ]
+  ports: [2181]

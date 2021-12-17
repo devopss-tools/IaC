@@ -1,0 +1,20 @@
+---
+# Install settings
+kafka_version: 0.11.0.1
+kafka_scala_version: 2.11
+kafka_download_url: http://www-eu.apache.org/dist/kafka/{{ kafka_version }}/kafka_{{ kafka_scala_version }}-{{ kafka_version }}.tgz
+kafka_install_dir: /usr/local/kafka
+kafka_log_dir: /var/lib/data/kafka/logs
+
+
+# Kafka zookeeper settings
+kafka_zookeeper_connect: 'localhost:2181'
+
+# Timeout in ms for connecting to zookeeper
+kafka_zookeeper_connection_timeout: 6000
+
+# Producer settings
+kafka_bootstrap_servers: 'kafak1.devopss.internal:9092'
+
+# Consumer settings
+kafka_consumer_group_id: kafka-consumer-group

@@ -1,0 +1,30 @@
+service:
+  etcd:
+    enabled: true
+    running: true
+
+command:
+#Test cluster health
+  /usr/local/sbin/etcdctl cluster-health | grep "cluster is healthy":
+    stdout:
+      - "cluster is healthy"
+    exit-status: 0
+    timeout: 1000
+#Test member in list
+  /usr/local/sbin/etcdctl member list | grep name={{ hostvars[inventory_hostname].ansible_hostname }}:
+    stdout:
+      - {{ hostvars[inventory_hostname].ansible_hostname }}
+    exit-status: 0
+    timeout: 1000
+#Test Leader exists
+  /usr/local/sbin/etcdctl member list | grep "isLeader=true":
+    stdout:
+      - true
+    exit-status: 0
+    timeout: 1000
+#Test non Leader exists
+  /usr/local/sbin/etcdctl member list | grep "isLeader=false":
+    stdout:
+      - false
+    exit-status: 0
+    timeout: 1000

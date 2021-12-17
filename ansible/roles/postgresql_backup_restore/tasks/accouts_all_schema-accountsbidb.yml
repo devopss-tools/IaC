@@ -1,0 +1,42 @@
+---
+- name: Backup all Accounts DBs schema only
+  shell: "export PGPASSWORD={{ pg_accounts_login_password_from }} && \
+          pg_dumpall -h {{ pg_accounts_host_from }} -p 5432 -U {{ pg_accounts_login_user_from }} -w -f {{ pg_data_backup_dir }}/global-schema-{{ pg_backup_version }}.dump --schema-only -v"
+  register: backup_sync_status
+  tags: migrate_accounts_db
+  failed_when: backup_sync_status.failed == true
+
+
+- name: Restore all Accounts DBs schema only
+  shell: "export PGPASSWORD={{ pg_accounts_login_password_to }} && \
+          psql postgres -h {{ pg_accounts_host_to }} -p 5432 -U {{ pg_accounts_login_user_to }} -f {{ pg_data_backup_dir }}/global-schema-{{ pg_backup_version }}.dump"
+  register: restore_schema_status
+  tags: migrate_accounts_db
+  failed_when: restore_schema_status.failed == true
+
+- name: Backup Global BI DB data only
+  postgresql_db:
+    name: "global_bi"
+    state: dump
+    target: "{{ pg_data_backup_dir }}/test-global-bi-{{ pg_backup_version }}.gz"
+    target_opts: "--data-only"
+    login_host: "{{ pg_accounts_host_from }}"
+    login_password: "{{ pg_accounts_login_password_from }}"
+    login_user: "{{ pg_accounts_login_user_from }}"
+#    owner: "{{ pg_owner_to }}"
+  tags: migrate_accounts_db
+
+- name: Restore Global BI DB data only
+  postgresql_db:
+    name: "global_bi"
+    state: restore
+    target: "{{ pg_data_backup_dir }}/test-global-bi-{{ pg_backup_version }}.gz"
+    login_host: "{{ pg_accounts_host_to }}"
+    login_password: "{{ pg_accounts_login_password_to }}"
+    login_user: "{{ pg_accounts_login_user_to }}"
+#    owner: "{{ pg_owner_to }}"
+  register: restore_global_bi_status
+  tags: migrate_accounts_db
+
+
+

@@ -1,0 +1,7 @@
+---
+# restart iptables service
+- name: iptables_restart
+  service:
+    name: iptables
+    state: restarted
+    enabled: yes

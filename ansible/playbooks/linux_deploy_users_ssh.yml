@@ -1,0 +1,11 @@
+---
+#se foloseste la Globaldatabase
+- name: deploy all users ssh keys
+  become: true
+  hosts:
+    - all
+
+  roles:
+    # Deployment of ssh users keys
+    - { role: linux_config_users_ssh }
+

@@ -1,0 +1,2 @@
+---
+linux_config_ntp_zoneinfo_path: "/usr/share/zoneinfo/Europe/Chisinau"

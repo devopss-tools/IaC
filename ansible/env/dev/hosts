@@ -1,0 +1,104 @@
+
+#[test-group]
+#ansible-test-4 ansible_host=10.1.1.188
+#ansible-test-5 ansible_host=10.1.1.46 docker_version=19.03.9
+
+[docker-group:children]
+k8s-worker-group
+akeneo-group
+
+[etcd-group]
+k8smd01 ansible_host=k8smd01.devopss.dev
+k8smd02 ansible_host=k8smd02.devopss.dev
+k8smd03 ansible_host=k8smd03.devopss.dev
+
+[k8s-group:children]
+k8s-master-group
+k8s-worker-group
+
+[k8s-master-group]
+k8smd01 ansible_host=k8smd01.devopss.dev
+k8smd02 ansible_host=k8smd02.devopss.dev
+k8smd03 ansible_host=k8smd03.devopss.dev
+
+
+[k8s-worker-group]
+k8swd01 ansible_host=k8swd01.devopss.dev kubelet_config_pod_cidr=172.16.1.0/24
+k8swd02 ansible_host=k8swd02.devopss.dev kubelet_config_pod_cidr=172.16.2.0/24
+k8swd03 ansible_host=k8swd03.devopss.dev kubelet_config_pod_cidr=172.16.3.0/24
+k8swd04 ansible_host=k8swd04.devopss.dev kubelet_config_pod_cidr=172.16.4.0/24
+k8swd05 ansible_host=k8swd05.devopss.dev kubelet_config_pod_cidr=172.16.5.0/24
+k8swd06 ansible_host=k8swd06.devopss.dev kubelet_config_pod_cidr=172.16.6.0/24
+k8swd07 ansible_host=k8swd07.devopss.dev kubelet_config_pod_cidr=172.16.7.0/24
+k8swd08 ansible_host=k8swd08.devopss.dev kubelet_config_pod_cidr=172.16.8.0/24
+k8swd09 ansible_host=k8swd09.devopss.dev kubelet_config_pod_cidr=172.16.9.0/24
+k8swd10 ansible_host=k8swd10.devopss.dev kubelet_config_pod_cidr=172.16.10.0/24
+k8swd11 ansible_host=k8swd11.devopss.dev kubelet_config_pod_cidr=172.16.11.0/24
+k8swd12 ansible_host=k8swd12.devopss.dev kubelet_config_pod_cidr=172.16.12.0/24
+k8swd13 ansible_host=k8swd13.devopss.dev kubelet_config_pod_cidr=172.16.13.0/24
+k8swd14 ansible_host=k8swd14.devopss.dev kubelet_config_pod_cidr=172.16.14.0/24
+k8swd15 ansible_host=k8swd15.devopss.dev kubelet_config_pod_cidr=172.16.15.0/24
+
+
+#[elasticsearch-group:children]
+
+[elasticsearch-platform-group]
+es7-dev-platform-chat ansible_host=10.1.1.124
+es7-dev-5amclub ansible_host=10.1.1.166
+es75-dev-com-01 ansible_host=10.1.1.49
+
+[es-test-group]
+es75-test-01     ansible_host=es75-test-01.devopss.dev
+es75-test-02     ansible_host=es75-test-02.devopss.dev
+es75-test-03     ansible_host=es75-test-03.devopss.dev
+
+[redis-group]
+redis5-dev-shared-01 ansible_host=10.1.1.115
+redis5-dev-shared-02 ansible_host=10.1.1.244
+
+[mongo-group]
+mongo-com-4-01 ansible_host=10.1.1.15
+
+[pgsql-group:children]
+pgsql-test-group
+pg11c01-group
+
+[pg11c01-group]
+pg11c01 ansible_host=pg11c01.devopss.net
+pg11c02 ansible_host=pg11c02.devopss.net
+
+[pgsql-test-group]
+pgsql12-test-01  ansible_host=pgsql12-test-01.devopss.dev
+
+[rabbitmq-group]
+rabbitmq37com01 ansible_host=rbmq37c01.devopss.net
+
+
+[nfs-group]
+nfs-devopss-dev     ansible_host=10.1.1.237
+
+[kafka-group:children]
+kafka-test-dev-group
+
+[kafka-test-dev-group]
+kafka23-test-01  ansible_host=kafka23-test-01.devopss.dev
+
+[redis-group:children]
+redis-test-group
+
+[redis-test-group]
+redis5-test-01 ansible_host=redis5-test-01.devopss.dev     vault_redis_password={{vault_test_redis_password}}
+
+#[es-monitoring-group]
+
+#[gateway-group]
+
+[akeneo-group]
+akeneo-xtopus-01    ansible_host=akeneo-xtopus-01.devopss.dev
+
+[localhost]
+localhost ansible_host=127.0.0.1 ansible_connection=local
+
+[tmp-group]
+vpn-primecapital ansible_host=10.1.1.247
+

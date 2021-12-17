@@ -1,0 +1,22 @@
+---
+- service:
+    name: postgresql-12
+    state: started
+
+# create database
+- postgresql_db:
+    name: "{{ postgresql_db_config_name }}"
+    encoding: UTF-8
+    login_password: "{{ postgresql_db_config_login_password }}"
+    login_user: "{{ postgresql_db_config_login_user }}"
+
+# create database users
+- postgresql_user:
+    db: "{{ postgresql_db_config_name }}"
+    login_password: "{{ postgresql_db_config_login_password }}"
+    login_user: "{{ postgresql_db_config_login_user }}"
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+    encrypted: yes
+  with_items: "{{ postgresql_db_config_users }}"

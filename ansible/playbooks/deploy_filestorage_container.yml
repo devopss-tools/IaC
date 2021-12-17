@@ -1,0 +1,9 @@
+---
+- name: deploy docker
+  become: true
+  hosts:
+#    - docker-group
+    - storage-group
+
+  roles:
+    - { role: filestorage_container_deploy }

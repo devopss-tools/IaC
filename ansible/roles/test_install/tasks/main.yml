@@ -1,0 +1,24 @@
+---
+# - name: execute shell
+#   shell: sudo systemctl enable kubelet
+
+# - name: execute shell
+#   shell: sudo systemctl start kubelet
+
+# - name: execute shell
+#   shell: iptables -P FORWARD ACCEPT
+
+- name: test
+  template:
+    src: "{{item.src}}"
+    dest: "/tmp/{{item.path}}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_filetree:
+    - "{{ansible_root_path}}/testvault/k8s_access_roles/test01/"
+
+#- name: execute shell
+#  shell: sudo docker image prune -a -f
+
+

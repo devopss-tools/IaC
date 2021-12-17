@@ -1,0 +1,21 @@
+---
+- name: deploy elasticsearch cluster
+  become: true
+  hosts:
+    - es-group
+    - elasticsearch-group
+    - es-general-index-group
+    - es-test-group
+    - es-monitoring-group
+  roles:
+    - { role: package, pkgs: ['epel-release', 'jq', 'net-tools'], tags: [ "es_install"] }
+    - { role: package,
+             pkgs:
+                [
+                  "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/{{ jdk_url }}",
+                  "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/{{ es_url }}"
+                ],
+              tags: [ "es_install"]
+      }
+    - { role: es_config, es_config_reload_scripts_interval: 15s, tags: [ "es_config"] }
+

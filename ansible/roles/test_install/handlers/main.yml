@@ -1,0 +1,14 @@
+- name: systemd_reload
+  command: systemctl daemon-reload
+
+# enable kafka service
+- name: kafka_enable
+  service:
+    name: kafka
+    enabled: yes
+
+# restart kafka service
+- name: kafka_restart
+  service:
+    name: kafka
+    state: restarted

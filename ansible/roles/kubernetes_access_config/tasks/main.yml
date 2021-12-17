@@ -1,0 +1,119 @@
+---
+- name: Check if exist k8s certificates
+  local_action: "shell if [ ! -f {{ kubeadmin_dir }}/admin.kubeconfig ]; then echo 'Does not find file':' {{ kubeadmin_dir }}/admin.kubeconfig'; mkdir -pv {{ kubeadmin_dir }}; fi "
+  register: result
+
+- debug:
+    msg: "{{ result.stdout }}"
+  when: result.stdout != ""
+
+- name: Create configuration csr file
+  local_action: "template src=admin-csr.json.j2 dest={{ kubeadmin_dir }}/admin-csr.json"
+  when: result.stdout != ""
+
+############    Set admin user/role ############
+- name: Generate kubernetes admin certificate and access key
+  local_action: "shell {{ binaries_root_path }}/cfssl gencert -ca={{ ca_certificate_file }} \
+                                    -ca-key={{ ca_key_path }} \
+                                    -config={{ certificate_config }} \
+                                    -profile=kubernetes \
+                                    {{ kubeadmin_dir }}/admin-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ kubeadmin_dir }}/admin"
+  when: result.stdout != ""
+
+
+- name: Kubectl - Configure access to cluster from localhost
+  local_action: "shell kubectl config set-cluster kubernetes \
+                                    --server=https://{{ hostvars[item]['ansible_host'] }}:6443 \
+                                    --embed-certs=true \
+                                    --certificate-authority={{ ca_certificate_file }} \
+                                    --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+  when: result.stdout != ""
+  with_items: "{{ groups['k8s-master-group'] }}"
+
+#                                    --server=https://{{groups['k8s-master-group'][0]}}:6443 \
+
+
+- name: Kubectl - Set credentials for access cluster admin
+  local_action: "shell kubectl config set-credentials admin \
+                                    --embed-certs=true \
+                                    --client-certificate={{ kubeadmin_dir }}/admin.pem \
+                                    --client-key={{ kubeadmin_dir }}/admin-key.pem \
+                                    --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+  when: result.stdout != ""
+
+
+- name: Kubectl - Set context admin-{{item}}
+  local_action: "shell kubectl config set-context context-{{item}} \
+                                    --cluster=kubernetes \
+                                    --user=admin \
+                                    --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+  when: result.stdout != ""
+  with_items: "{{ groups['k8s-master-group'] }}"
+
+
+- name: Kubectl - use context
+  local_action: "shell kubectl config use-context context-{{ groups['k8s-master-group'][0] }}  \
+                                    --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+  when: result.stdout != ""
+
+#############    Set kube Nodes role ############
+
+- name: Kubectl - apply Nodes roleBinding
+  local_action: "shell kubectl apply -f {{ role_path }}/files/clusterRoleBinding-kubeNodes.yaml \
+                                      --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+
+
+- name:  Kubectl - set Nodes roleBinding subject
+  local_action: "shell kubectl set subject clusterrolebinding system:node --group=system:nodes \
+                                      --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+
+
+##########    Set kubeapi user roles to access kublet api ##########
+
+- name: Kubectl - apply kubeapi cluserRoleBinding to access kubelet api
+  local_action: "shell kubectl apply -f {{ role_path }}/files/clusterRole-kubeletApiAdmin.yaml \
+                                     -f {{ role_path }}/files/clusterRoleBinding-kubeletApiAdmin.yaml \
+                                     --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+
+#- name: Kubectl - run Nginx for testing
+#  local_action: "shell kubectl apply -f {{ role_path }}/files/deploy_nginx_for_testing.yaml \
+#                                     --kubeconfig={{ kubeadmin_dir }}/admin.kubeconfig"
+
+############    Manage k8s Namespaces Access    ############
+
+- name: Include k8s Namespaces List Variables from .yml dictionary
+  include_vars: "{{ inventory_dir }}/group_vars/k8s-namespaces.yml"
+  tags: manage_namespaces
+
+- name: Manage k8s Namespaces
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'namespaces.yml') }}"
+    kubeconfig: "{{ kubeadmin_dir }}/admin.kubeconfig"
+  tags: manage_namespaces
+  with_dict: "{{ namespaces }}"
+
+- name: Include file to Manage k8s Namespaces Access
+  include_tasks: manage-namespaces-access.yml
+  with_dict: "{{ namespaces }}"
+  tags: manage_namespaces
+
+- name: Manage k8s RoleBindings
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'user_clusterRoleBinding.yml') }}"
+    kubeconfig: "{{ kubeadmin_dir }}/admin.kubeconfig"
+  tags: manage_namespaces
+  with_dict: "{{ namespaces }}"
+
+- name: Get Namespace Permissions':' "{{ item.value.name }}"
+  local_action: "shell echo 'Resource deploy:'; {{ binaries_root_path }}/rakkess r deploy -n {{ item.value.name }}; echo 'Resource namespace {{ item.value.name }}:';  {{ binaries_root_path }}/rakkess r namespace -n {{ item.value.name }}"
+  register: namespaces_permissions_result
+  tags: manage_namespaces
+  with_dict: "{{ namespaces }}"
+
+- name: json
+  debug:
+    var: namespaces_permissions_result | json_query('results[*].stdout_lines[*]')
+  tags: manage_namespaces
+

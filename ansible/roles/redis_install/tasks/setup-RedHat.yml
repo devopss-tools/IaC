@@ -1,0 +1,12 @@
+---
+
+- name: Download Redis package.
+  get_url:
+    url: "{{ redis_rpm_url }}"
+    dest: "/tmp/{{ redis_rpm }}"
+
+- name: Ensure Redis is installed.
+  yum:
+    name: "/tmp/{{ redis_rpm }}"
+    state: "present"
+

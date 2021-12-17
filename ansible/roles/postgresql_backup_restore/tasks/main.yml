@@ -1,0 +1,23 @@
+---
+- name: Check Intermediate Backup Directory, failed if does not exist
+  stat:
+    path: "{{ pg_data_backup_dir }}"
+  become: false
+  register: backup_intermed_dir_exists_status
+  tags: all
+  failed_when: backup_intermed_dir_exists_status.stat.exists == false
+
+- name: Include Tasks for Migrate Accounts PostGreSQL DataBase
+  include_tasks: test-sharedDBs.yml
+  tags: migrate_shared_db
+
+#- name: Include Tasks for Migrate Accounts PostGreSQL DataBase
+#  include_tasks: accouts_all_schema-accountsbidb.yml
+#  tags: migrate_accounts_db
+#
+#- name: Include Tasks for Migrate Accounts PostGreSQL DataBase
+#  include_tasks: accountsdb_data.yml
+#  tags: migrate_accounts_db
+
+
+

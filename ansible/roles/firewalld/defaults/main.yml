@@ -1,0 +1,34 @@
+# firewalld state( present | latest | absent )
+firewalld_state: latest
+
+# Print firewall rules (true | false)
+firewalld_debug: false
+
+# Add or remove firewall rules. By default will allow ssh connections.
+firewalld_rules:
+  devopss-net-pub:
+    source: 185.181.231.0/24
+    state: enabled
+    zone: trusted
+    permanent: true
+  test-net-priv:
+    source: 10.3.3.0/24
+    state: enabled
+    zone: trusted
+    permanent: true
+  devopss-net-priv:
+    source: 10.1.1.0/24
+    state: enabled
+    zone: trusted
+    permanent: true
+  devopss-vpn-priv:
+    source: 10.5.5.0/24
+    state: enabled
+    zone: trusted
+    permanent: true
+  devopss-net2-priv:
+    source: 192.168.88.0/24
+    state: enabled
+    zone: trusted
+    permanent: true
+

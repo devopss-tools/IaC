@@ -1,0 +1,16 @@
+{
+  "CN": "system:node:k8swd01.devopss.dev",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "MD",
+      "L": "Chisinau",
+      "O": "system:nodes",
+      "OU": "Kubernetes",
+      "ST": "Chisinau"
+    }
+  ]
+}

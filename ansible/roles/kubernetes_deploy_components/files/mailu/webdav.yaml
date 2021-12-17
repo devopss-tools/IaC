@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailu-webdav
+  namespace: devopss-platform-mailserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailu-webdav
+      role: mail
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: mailu-webdav
+        role: mail
+        tier: backend
+    spec:
+      containers:
+      - name: radicale
+        image: mailu/radicale:{{ mailu_version }}
+        imagePullPolicy: Always
+        envFrom:
+          - configMapRef:
+              name: mailu-config
+        volumeMounts:
+          - mountPath: /data
+            name: maildata
+            subPath: dav
+        ports:
+          - containerPort: 5232
+          - containerPort: 80
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 100m
+          limits:
+            memory: 100Mi
+            cpu: 100m
+      volumes:
+        - name: maildata
+          persistentVolumeClaim:
+            claimName: mail-storage
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webdav
+  namespace: devopss-platform-mailserver
+  labels:
+    app: mailu-webdav
+    role: mail
+    tier: backend
+spec:
+  type: ClusterIP
+  clusterIP: "{{ webdav_k8s_svc_ip }}"
+  selector:
+    app: mailu-webdav
+    role: mail
+    tier: backend
+  ports:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+  - name: http-ui
+    port: 5232
+    protocol: TCP

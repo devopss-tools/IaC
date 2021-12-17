@@ -1,0 +1,8 @@
+---
+- import_tasks: init_config.yml
+  tags: "nfs_deploy"
+
+- import_tasks: config.yml
+  tags:
+    - "nfs_deploy"
+    - "nfs_config"

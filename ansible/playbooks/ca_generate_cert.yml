@@ -1,0 +1,9 @@
+---
+- name: generate CA Authority Certs
+  become: true
+  become_user: "{{ lookup('env','USER') }}"
+  hosts: localhost
+  roles:
+    # generate CA Authority Certs
+    - { role: ca_cert_generate}
+

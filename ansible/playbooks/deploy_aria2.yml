@@ -1,0 +1,10 @@
+---
+- name: Download service
+  become: true
+  hosts: all
+  roles:
+    - { role: package, pkgs: ["epel-release", "iptables", "iptables-services", "iptables-utils",  "nginx", "nodejs", "unar", "unzip", "zip", "mailx", ], tags: [ "download_deploy"] }
+    - { role: package, pkgs: ["{{aria2_package}}"], tags: [ "download_deploy" ]}
+    - { role: aria2_config , tags: [ "download_config"]}
+    - { role: aria2web_config , tags: [ "download_config"]}
+    - { role: iptables_deploy_config, tags: [ "download_config"]}

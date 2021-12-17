@@ -1,0 +1,4 @@
+---
+# Set SELinux status
+- name: Set SELinux status
+  selinux: state={{ selinux_state }} policy={{ selinux_policy }}

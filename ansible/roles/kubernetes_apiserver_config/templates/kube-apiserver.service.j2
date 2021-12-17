@@ -1,0 +1,42 @@
+# version 0.3
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.service
+
+[Service]
+User=kubeapi
+ExecStart=/usr/local/sbin/kube-apiserver \
+  --advertise-address={{ ansible_currentHost_fact_ip }} \
+  --external-hostname={{ ansible_currentHost_fact_hostname }} \
+  --allow-privileged=true \
+  --bind-address=0.0.0.0 \
+  --apiserver-count=3 \
+  --audit-log-maxage=30 \
+  --audit-log-maxbackup=3 \
+  --audit-log-maxsize=100 \
+  --audit-log-path={{ kubernetes_apiserver_config_datadir }}/audit.log \
+  --authorization-mode=Node,RBAC \
+  --event-ttl=1h \
+  --kubelet-https=true \
+  --runtime-config=api/all=true \
+  --service-cluster-ip-range={{service_cluster_ip_range}} \
+  --service-node-port-range=30000-32767 \
+  --etcd-cafile=/var/lib/kubernetes/ca.pem \
+  --etcd-certfile=/var/lib/kubernetes/etcd_certs/etcd.pem \
+  --etcd-keyfile=/var/lib/kubernetes/etcd_certs/etcd-key.pem \
+  --etcd-servers={% for host in groups['etcd-group'] %}http://{{ hostvars[host].ansible_host }}:2379{% if not loop.last %},{% endif %}{% endfor %} \
+  --client-ca-file=/var/lib/kubernetes/ca.pem \
+  --service-account-key-file=/var/lib/kubernetes/ca-key.pem \
+  --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
+  --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
+  --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \
+  --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \
+  --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+

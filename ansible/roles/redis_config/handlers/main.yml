@@ -1,0 +1,12 @@
+---
+# enable redis service
+- name: redis_enable
+  service:
+    name: redis
+    enabled: yes
+
+# enable redis service
+- name: redis_restart
+  service:
+    name: redis
+    state: restarted

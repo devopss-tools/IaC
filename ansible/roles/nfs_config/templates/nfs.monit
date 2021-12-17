@@ -1,0 +1,12 @@
+check host localhost with address 0.0.0.0
+  start program = "/bin/systemctl start nfs-server" with timeout 60 seconds
+  stop program = "/bin/systemctl stop nfs-server"
+  if failed port 2049 then exec "/etc/monit.d/monit2telegram"  repeat every 2 cycles
+  if failed port 2049 then restart every 5 cycles
+
+check program nfs-goss-tests with path "/usr/local/sbin/goss --gossfile /etc/goss.d/{{ goss_test_files.0 }} validate --format tap"
+  with timeout 10 seconds
+  start program = "/bin/systemctl start nfs-server" with timeout 60 seconds
+  stop program = "/bin/systemctl stop nfs-server"
+  if status != 0 then exec "/etc/monit.d/monit2telegram"  repeat every 3 cycles
+  if status != 0 then restart every 5 cycles

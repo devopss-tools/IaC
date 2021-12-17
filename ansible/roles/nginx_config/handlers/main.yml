@@ -1,0 +1,18 @@
+---
+# enable nginx service
+- name: nginx_enable
+  service:
+    name: nginx
+    enabled: yes
+
+# enable nginx service
+- name: nginx_restart
+  service:
+    name: nginx
+    state: restarted
+
+# restart nginx service
+- name: nginx_reload
+  service:
+    name: nginx
+    state: reloaded

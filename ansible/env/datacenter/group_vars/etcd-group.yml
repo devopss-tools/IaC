@@ -1,0 +1,19 @@
+---
+# The minimum recommended version for k8s: 3.2.10+
+etcd_version: "v3.3.10"
+etcd_config_cluster_token: "etcd-token-sa34dsf45fsd4566"
+
+filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/kubernetes"} ]
+etcd_certificate_root_path: "{{ certificates_root_path }}/etcd"
+
+firewalld_port:
+  etcd:
+    port: 2379-2380
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+
+
+
+

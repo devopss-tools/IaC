@@ -1,0 +1,7 @@
+
+linux_filesystem_map: [
+  {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/rabbitmq"}
+]
+
+rabbitmq_version: "3.7.15"
+erlang_version: "23.2.1"

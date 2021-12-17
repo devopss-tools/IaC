@@ -1,0 +1,40 @@
+---
+- name: Create docker service folder
+  file:
+    path: "{{ redis_storage_dir }}"
+    state: directory
+    mode: "0700"
+    owner: redis
+    group: root
+    recurse: yes
+
+# redis config
+- name: Deploy /etc/redis.conf
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis.conf
+    owner: redis
+    group: root
+    mode: "0640"
+    backup: yes
+
+- name: Redis -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 6379 will fail if redis was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 6379
+    delay: 5
+    timeout: 60
+
+- name: Redis - config
+  shell: "redis-cli config set stop-writes-on-bgsave-error no"
+
+- name: import goss test role
+  import_role:
+    name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules

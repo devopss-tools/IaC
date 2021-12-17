@@ -1,0 +1,21 @@
+{
+  "CN": "system:node:k8smd01.devopss.dev",
+  "hosts": [
+      "k8smd01.devopss.dev","k8smd02.devopss.dev","k8smd03.devopss.dev",
+      "127.0.0.1",
+      "etcd.default"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "MD",
+      "L": "Chishinau",
+      "O": "etcd",
+      "OU": "Cluster",
+      "ST": "Chishinau"
+    }
+  ]
+}

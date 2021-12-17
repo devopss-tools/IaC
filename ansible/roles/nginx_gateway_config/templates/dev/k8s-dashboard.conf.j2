@@ -1,0 +1,18 @@
+server {
+    listen 80;
+    server_name k8s-dashboard.devopss.net;
+    location / {
+        proxy_max_temp_file_size 6144m;
+         return 301 https://$server_name$request_uri;
+    }
+}
+
+server {
+    listen 443;
+    server_name k8s-dashboard.devopss.net www.k8s-dashboard.devopss.net;
+    location / {
+        proxy_max_temp_file_size 6144m;
+        proxy_pass https://10.1.1.96:30443/;
+
+    }
+}

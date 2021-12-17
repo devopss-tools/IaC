@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ item.value.serviceAccount }}
+  namespace: {{ item.value.name }}
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: list-namespaces
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: [ "get", "list", "watch"]
+
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ item.value.role }}
+  namespace: {{ item.value.name }}
+rules:
+  - verbs:
+      - '*'
+    apiGroups:
+      - '*'
+    resources:
+      - '*'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ item.value.userName }}
+  namespace: {{ item.value.name }}
+subjects:
+  - kind: User
+    name: {{ item.value.userName }}
+    apiGroup: rbac.authorization.k8s.io
+    namespace: {{ item.value.name }}
+  - kind: ServiceAccount
+    name: {{ item.value.serviceAccount }}
+    namespace: {{ item.value.name }}
+roleRef:
+  kind: ClusterRole
+  name: {{ item.value.role }}
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: list-namespaces-{{ item.value.name }}
+#  namespace: {{ item.value.name }}
+subjects:
+  - kind: User
+    name: {{ item.value.userName }}
+    apiGroup: rbac.authorization.k8s.io
+    namespace: {{ item.value.name }}
+  - kind: ServiceAccount
+    name: {{ item.value.serviceAccount }}
+    namespace: {{ item.value.name }}
+roleRef:
+  kind: ClusterRole
+  name: list-namespaces
+  apiGroup: "rbac.authorization.k8s.io"
+

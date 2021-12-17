@@ -1,0 +1,23 @@
+---
+
+- name: systemd_reload
+  shell: systemctl daemon-reload
+
+- name: Reload firewalld
+  become: yes
+  service:
+    name: firewalld
+    state: reloaded
+
+# enable kube-proxy service
+- name: kube_proxy_enable
+  service:
+    name: kube-proxy
+    enabled: yes
+
+# restart kube-proxy service
+- name: kube_proxy_restart
+  service:
+    name: kube-proxy
+    state: restarted
+

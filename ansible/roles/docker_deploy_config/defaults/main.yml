@@ -1,0 +1,5 @@
+---
+docker_config_dir: "/etc/docker"
+docker_config_file: "/etc/docker/daemon.json"
+docker_config_root: "/root/.docker"
+goss_test_files: ["docker.yml"]

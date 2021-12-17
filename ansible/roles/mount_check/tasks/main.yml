@@ -1,0 +1,18 @@
+- set_fact:
+    mount: "de setat extragerea mapelor montate de pe hostul client"
+
+- name: Ensure that data directory is mounted correctly
+  assert:
+    that:
+      - linux_filesystem_map[0].dev != item.dev
+      - linux_filesystem_map[0].path != item.path
+    fail_msg: "Error. Data directory is not mounted correctly. Should be {{ linux_filesystem_map[0].path }} directory on {{ linux_filesystem_map[0].dev }} disk."
+    success_msg: "The mount is correct."
+  with_items:
+    - "{{ mount }}"
+  tags:
+    - mount_check
+
+#  when: item.device == "{{ disk_device }}"
+
+

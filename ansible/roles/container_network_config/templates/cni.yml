@@ -1,0 +1,23 @@
+command:
+
+{% if cni_version == 'v0.7.5' %}
+
+#Test Container Network Interface version
+  /bin/strings {{ cni_dir }}/portmap:
+    exit-status: 0
+    timeout: 1000
+{% endif %}
+
+#Test Container Network Interface Specification version
+  cat /etc/cni/net.d/10-bridge.conf | grep "cniVersion":
+    stdout:
+      - {{ cniSpec_version }}
+    exit-status: 0
+    timeout: 1000
+
+#Test Container Network Interface Specification version
+  cat /etc/cni/net.d/99-loopback.conf | grep "cniVersion":
+    stdout:
+      - {{ cniSpec_version }}
+    exit-status: 0
+    timeout: 1000

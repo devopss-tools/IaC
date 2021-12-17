@@ -1,0 +1,58 @@
+---
+- name: Ensure that RAM is greater than 3 GB
+  assert:
+    that:
+      - ansible_memtotal_mb >= 3*1024
+    msg: " ERROR total memory is {{ ansible_memtotal_mb }} MB, minimal required space is 3 GB. "
+
+- set_fact:
+    mount: "{{ ansible_mounts | selectattr('mount') | list }}"
+
+- name: Ensure that free space on {{ disk_device }} volume is greater than 4096MB
+  assert:
+    that:
+      - item.size_available >= 4096*1024*1024
+    msg: " ERROR free disk space on Nexus Volume. Device: {{ item.device }}, size_available:{{ item.size_available }} bytes, the minimal required space is 4096 MB. "
+  with_items:
+    - "{{ mount }}"
+  when: item.device == "{{ disk_device }}"
+
+- name: Pip install docker-py
+  pip:
+    name: docker-py
+
+- name: Create a Nexus Registry OSS v3 docker volume
+  docker_volume:
+    name: nexus_volume
+# Not available in ansible 2.4
+#    recreate: never
+
+- name: Pull Nexus Registry OSS v3 docker image
+  docker_image:
+    name: "{{ container_docker_image }}:{{ container_docker_tag }}"
+# Not available in ansible 2.4
+#    source: pull
+
+- name: Run Nexus Registry OSS v3 on docker container
+  docker_container:
+    name: nexus
+    hostname: nexus
+    image: "{{ container_docker_image }}:{{ container_docker_tag }}"
+    network_mode: host
+    restart_policy: always
+    volumes:
+      - nexus_volume:{{ container_nexus_data_dir }}
+
+- name: Wait/Check Nexus Registry OSS v3 container for 5 minutes.
+  wait_for:
+    host: "localhost"
+    port: 8081
+    timeout: 300
+
+- name: Check {{ container_nexus_data_dir }}/admin.password, need for first login
+  shell: docker exec -i nexus sh -c "cat {{ container_nexus_data_dir }}/admin.password"
+  register: result
+  ignore_errors: True
+
+- debug:
+    msg: "First login admin_token_password: {{ result.stdout_lines }}"

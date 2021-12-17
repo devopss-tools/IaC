@@ -1,0 +1,11 @@
+---
+- name: deploy nexus on dokcer
+  become: true
+  hosts:
+    test-group
+    nexus-group
+
+  roles:
+    # deploy nexus
+    - { role: package, pkgs: ["python-pip"], tags: [ "nexus_deploy"]}
+    - { role: nexus_deploy, tags: [ "nexus_deploy"]}

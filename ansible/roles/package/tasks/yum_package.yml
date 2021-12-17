@@ -1,0 +1,6 @@
+---
+- name: yum install "{{ item }}"
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ pkgs }}"

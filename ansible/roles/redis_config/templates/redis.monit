@@ -1,0 +1,5 @@
+check host localhost with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start redis" with timeout 60 seconds
+  stop program = "/bin/systemctl stop redis"
+  if failed port 6379 then exec "/etc/monit.d/monit2telegram Redis"  repeat every 2 cycles
+  if failed port 6379 then restart every 5 cycles

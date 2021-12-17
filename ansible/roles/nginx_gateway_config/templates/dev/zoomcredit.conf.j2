@@ -1,0 +1,93 @@
+upstream {{ zoomcredit.domain }} {
+    least_conn;
+    {% for host in groups['k8s-worker-group'] %} server {{ hostvars[host]['ansible_host']}}:{{ zoomcredit.port }};
+    {% endfor %}
+}
+server {
+    client_max_body_size 20M;
+    server_name {{ zoomcredit.domain }};
+    rewrite ^/(.*)/$ /$1 permanent;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    location ~ ^/(_next|static)/ {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        if (!-f $request_filename) {
+            proxy_pass http://{{ zoomcredit.domain }};
+            break;
+        }
+        add_header Set-Cookie cip=$remote_addr;
+        add_header Set-Cookie chost=$Host;
+        proxy_buffer_size   128k;
+        proxy_buffers   4 256k;
+        proxy_busy_buffers_size   256k;
+    }
+
+    location ~ [A-Z] {
+#      return 301 $scheme://$host$my_uri_to_lowercase;
+      proxy_pass http://{{ zoomcredit.domain }};
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_connect_timeout 600;
+      proxy_send_timeout 600;
+      proxy_read_timeout 600;
+      proxy_redirect off;
+      proxy_buffer_size   128k;
+      proxy_buffers   4 256k;
+      proxy_busy_buffers_size   256k;
+    }
+
+    location / {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      if (!-f $request_filename) {
+          proxy_pass http://{{ zoomcredit.domain }};
+          break;
+      }
+      add_header Set-Cookie cip=$remote_addr;
+      add_header Set-Cookie chost=$Host;
+      proxy_buffer_size   128k;
+      proxy_buffers   4 256k;
+      proxy_busy_buffers_size   256k;
+    }
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/{{ zoomcredit.domain }}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/{{ zoomcredit.domain }}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+
+server {
+    server_name www.{{ zoomcredit.domain }};
+    return 301 $scheme://{{ zoomcredit.domain }}$request_uri;
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/{{ zoomcredit.domain }}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/{{ zoomcredit.domain }}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = {{ zoomcredit.domain }}) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+    server_name {{ zoomcredit.domain }};
+    listen 80;
+    return 404; # managed by Certbot
+}
+
+server {
+    if ($host = www.{{ zoomcredit.domain }}) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+    server_name www.{{ zoomcredit.domain }};
+    listen 80;
+    return 404; # managed by Certbot
+}

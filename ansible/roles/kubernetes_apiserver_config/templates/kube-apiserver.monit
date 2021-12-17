@@ -1,0 +1,5 @@
+check host localhost with address 0.0.0.0
+  start program = "/bin/systemctl start kube-apiserver" with timeout 60 seconds
+  stop program = "/bin/systemctl stop kube-apiserver"
+  if failed port 8080 then exec "/etc/monit.d/monit2telegram kube-apiserver"  repeat every 2 cycles
+  if failed port 8080 then restart every 5 cycles

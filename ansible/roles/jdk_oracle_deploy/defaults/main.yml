@@ -1,0 +1,9 @@
+---
+# download link to Oracle JDK rpm package
+##jdk_url: https://repo.huaweicloud.com/java/jdk/8u191-b12/jdk-8u191-linux-x64.rpm
+#jdk_url: https://repo.huaweicloud.com/java/jdk/8u202-b08/jdk-8u202-linux-x64.rpm
+jdk_url: http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{ devopss_nexus_port }}/repository/raw-repository/java-jdk/8u202/jdk-8u202-linux-x64.rpm
+#  http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jdk-8u181-linux-x64.rpm
+jdk_filename: "{{jdk_url | basename}}"
+new_java_version: "1.{{ jdk_filename | regex_replace('jdk-(\\d+)u(\\d+)-linux.*','\\1') }}.0_{{ jdk_filename | regex_replace('jdk-(\\d+)u(\\d+)-linux.*','\\2')}}"
+java_home: "/usr/java/jdk{{ new_java_version }}-amd64"

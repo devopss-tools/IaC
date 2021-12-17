@@ -1,0 +1,32 @@
+- name: Init_Config -  stat if mount point exist
+  stat: path="{{ item.path }}"
+  with_items: "{{ linux_filesystem_map }}"
+  register: mount_point
+
+- name: Init_Config -  set permissions for nfs storage
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: "yes"
+    mode: "0755"
+    owner: nfsnobody
+    group: nfsnobody
+  when: mount_point.results.0.stat.exists
+  with_together:
+    - "{{ linux_filesystem_map.0.path }}"
+#    - "{{ mount_point.results }}"
+
+- name: Init_Config -  set permissions for nfs storage 2
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: "yes"
+    mode: "0755"
+    owner: nfsnobody
+    group: nfsnobody
+  when: mount_point.results.0.stat.exists
+  with_items:
+    - "/var/lib/nfs/statd"
+#    - "/var/lib/nfs/etab"
+    - "/var/lib/nfs/rpc_pipefs"
+    - "{{ nfs_storage_dir }}/data-volumes"

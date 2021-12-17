@@ -1,0 +1,50 @@
+---
+- name: Create config folder
+  file:
+    path: "/etc/cni/net.d"
+    state: directory
+    mode: "0755"
+    recurse: "yes"
+    owner: root
+    group: root
+
+- name: Create 10-bridge.conf.j2
+  template:
+    src: 10-bridge.conf.j2
+    dest: "/etc/cni/net.d/10-bridge.conf"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Create 99-loopback.conf.j2
+  template:
+    src: 99-loopback.conf.j2
+    dest: "/etc/cni/net.d/99-loopback.conf"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Iptables frowarding
+  iptables:
+    chain: FORWARD
+    policy: ACCEPT
+  become: yes
+
+- name: Set ip forwarding on in /proc and in the sysctl file and reload if necessary
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: import goss tests tasks
+  import_role:
+    name: goss_test
+  tags: "k8sworker_goss_tests"
+
+
+
+
+
+

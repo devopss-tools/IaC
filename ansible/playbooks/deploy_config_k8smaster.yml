@@ -1,0 +1,23 @@
+---
+- name: deploy kubernetes master
+  become: true
+  hosts: k8s-master-group
+  roles:
+    # deploy kube_master
+    - { role: package_download,
+             pkgs:
+                [
+                  {"name" : "kube-apiserver", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kube-apiserver"},
+                  {"name" : "kube-controller-manager", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kube-controller-manager"},
+                  {"name" : "kube-scheduler", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kube-scheduler"},
+                  {"name" : "kubectl", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kubectl"}
+                ],
+              tags: [ "k8smaster_deploy"]
+      }
+    - { role: kubernetes_apiserver_config, tags: [ "k8smaster_config"]}
+    - { role: kubernetes_scheduler_config, tags: [ "k8smaster_config"]}
+    - { role: kubernetes_control_manager_config, tags: [ "k8smaster_config"]}
+# Run k8s master components Goss tests
+    - { role: kubernetes_apiserver_config }
+    - { role: kubernetes_scheduler_config }
+    - { role: kubernetes_control_manager_config }

@@ -1,0 +1,27 @@
+# version 0.1
+[Unit]
+Description=etcd
+After=network.service
+
+[Service]
+User=etcd
+Type=notify
+WorkingDirectory=/home/etcd
+ExecStart=/usr/local/sbin/etcd \
+--trusted-ca-file=/etc/etcd/ca.pem \
+--peer-trusted-ca-file=/etc/etcd/ca.pem \
+--peer-client-cert-auth \
+--client-cert-auth \
+--cert-file=/etc/etcd/etcd.pem \
+--key-file=/etc/etcd/etcd-key.pem \
+--peer-cert-file=/etc/etcd/etcd.pem \
+--peer-key-file=/etc/etcd/etcd-key.pem \
+--config-file {{ etcd_config_file }} \
+--data-dir {{ etcd_config_datadir }}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+

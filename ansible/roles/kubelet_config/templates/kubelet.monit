@@ -1,0 +1,5 @@
+check host localhost with address 0.0.0.0
+  start program = "/bin/systemctl start kubelet" with timeout 60 seconds
+  stop program = "/bin/systemctl stop kubelet"
+  if failed port 10248 then exec "/etc/monit.d/monit2telegram"  repeat every 2 cycles
+  if failed port 10248 then restart every 5 cycles

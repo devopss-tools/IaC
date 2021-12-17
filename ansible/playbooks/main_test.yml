@@ -1,0 +1,8 @@
+---
+- name: test-group
+  become: true
+  hosts: test-group
+  roles:
+    # Install java kafka-group
+    - { role: test_install, tags: [ "test_encrypt"] }
+   

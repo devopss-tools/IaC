@@ -1,0 +1,19 @@
+---
+- name: Include Tasks to add/remove every deploy_user keys
+  include: deploy_user_deploy.yml
+
+- name: Include Users List Variables from .yml dictionary
+  include_vars: "{{ inventory_dir }}/group_vars/ssh-users-groups.yml"
+  tags: "ssh_users_keys"
+
+- name: Include Tasks to deploy user key
+  include: deploy_list_users.yml
+  with_dict: "{{ users }}"
+  tags: "ssh_users_keys"
+
+- name: Include Tasks to add every user key
+  include: deploy_list_users.yml
+  with_dict: "{{ users }}"
+  tags: "ssh_users_keys"
+
+

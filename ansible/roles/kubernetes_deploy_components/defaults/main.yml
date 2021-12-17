@@ -1,0 +1,12 @@
+---
+k8s_access_roles_dir: "{{ certificates_root_path_target }}/k8s_access_roles"
+kubeadmin_dir: "{{ k8s_access_roles_dir }}/kubeadmin"
+heartbeat_version: 7.2.0
+#kibana_host: "kibana.test.internal"
+kibana_replica_number: "3"
+kibana_host: "kibana-test.devopss.net"
+kibana_port: "80"
+es_host: "{{ hostvars[groups['es-monitoring-group'][0]].ansible_host }}"
+es_port: "9200"
+nfs_monitoring_dir: "/var/lib/nfs/data-volumes/k8s-volumes/monitoring"
+root_path: "{{ playbook_dir }}"

@@ -1,0 +1,13 @@
+{
+  "insecure-registries": [
+    "{{ devopss_internal_nexus_address_name }}:8123",
+    "{{ devopss_internal_nexus_address_name }}:8081"
+  ],
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "5",
+    "labels": "{{ env_name }}",
+    "env": "{{ env_name }}"
+  }
+}
+

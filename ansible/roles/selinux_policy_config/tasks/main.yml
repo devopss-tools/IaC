@@ -1,0 +1,15 @@
+---
+#copy policy to target host
+- name: "SELinux - copy type enforcement file"
+  template:
+      src: "{{ item }}"
+      dest: "/tmp/"
+      mode: 0644
+  with_items: "{{ selinux_policy_files }}"
+
+#Install new policy
+- name: "SELinux - build and install policy"
+  shell: "{{ selinux_policy_compile_module }} && {{ selinux_policy_create_package }} && {{ selinux_policy_load_module }}"
+  args:
+    chdir: "/tmp"
+  with_items: "{{ selinux_policy_files }}"

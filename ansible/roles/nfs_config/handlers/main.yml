@@ -1,0 +1,6 @@
+# restart nfs server
+- name: nfs_restart
+  service:
+    name: nfs-server
+    state: restarted
+    enabled: yes

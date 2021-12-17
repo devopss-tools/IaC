@@ -1,0 +1,23 @@
+{
+  "CN": "system:node:{{ ansible_currentHost_fact_hostname }}",
+  "hosts": [
+      {% for host in groups['k8s-master-group'] %}"{{ hostvars[host].ansible_host }}",{% endfor %}
+
+      "{{k8s_api_server_ip}}",
+      "127.0.0.1",
+      "kubernetes.default"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "MD",
+      "L": "Chisinau",
+      "O": "system:nodes",
+      "OU": "Kubernetes",
+      "ST": "Chisinau"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+service:
+  kube-scheduler:
+    enabled: true
+    running: true
+
+command:
+#Test kube-scheduler version
+  /usr/local/sbin/kube-scheduler --version:
+    stdout:
+      - {{ k8s_version }}
+    exit-status: 0
+    timeout: 1000
+
+#Test kube-scheduler health on http
+  /bin/curl http://127.0.0.1:10251/healthz:
+    stdout:
+      - ok
+    exit-status: 0
+    timeout: 1000

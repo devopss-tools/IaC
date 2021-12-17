@@ -1,0 +1,4 @@
+service:
+  pgbouncer:
+    enabled: true
+    running: true

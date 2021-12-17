@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heartbeat-config
+  namespace: monitoring
+  labels:
+    k8s-app: heartbeat
+data:
+  heartbeat.yml: |-
+    output.elasticsearch:
+      hosts: '${ELASTICSEARCH_HOSTS}'
+    #  username: '${ELASTICSEARCH_USERNAME:}'
+    #  password: '${ELASTICSEARCH_PASSWORD:}'
+    #processors:
+    #- add_cloud_metadata: ~
+    #- add_docker_metadata: ~
+    setup.ilm:
+      # enables or disables index lifecycle management on any new indices created by Heartbeat
+      setup.ilm.enabled: true
+      # Set the prefix used in the index lifecycle write alias name. The default alias
+      setup.ilm.rollover_alias: "heartbeat"
+      # Set the rollover index pattern. The default is "%{now/d}-000001".
+      setup.ilm.pattern: "{now/d}-000001"
+      # Max Age/Size policy
+      # setup.ilm.policy_file: /usr/share/heartbeat/config/ilm.json
+    heartbeat.config.monitors:
+      # Directory + glob pattern to search for configuration files
+      path: /usr/share/heartbeat/monitors.d/*.yml
+      # If enabled, heartbeat will periodically check the config.monitors path for changes
+      reload.enabled: true
+      # How often to check for changes
+      reload.period: 60s
+    heartbeat.monitors:
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: heartbeat-monitoring
+  name: heartbeat-monitoring
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: heartbeat-monitoring
+  template:
+    metadata:
+      labels:
+        k8s-app: heartbeat-monitoring
+    spec:
+      containers:
+      - name: heartbeat-monitoring
+        image: docker.elastic.co/beats/heartbeat:{{ heartbeat_version }}
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "{% for host in groups['es-monitoring-group'] %}{{ hostvars[host].ansible_host }}:{{ es_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+        - name: ELASTICSEARCH_PORT
+          value: "{{ es_port }}"
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            cpu: '0.2'
+            memory: 100Mi
+          requests:
+            cpu: '0.1'
+            memory: 50Mi
+        volumeMounts:
+        - name: heartbeat-rules-volume
+          mountPath: /usr/share/heartbeat/monitors.d/
+        - name: heartbeat-config-volume
+          mountPath: /usr/share/heartbeat/heartbeat.yml
+          subPath: heartbeat.yml
+          readOnly: true
+      volumes:
+      - name: heartbeat-rules-volume
+        hostPath:
+          path: /mnt/k8s-volumes/monitoring/heartbeat/monitors.d/
+          type: DirectoryOrCreate
+      - name: heartbeat-config-volume
+        configMap:
+          defaultMode: 0600
+          name: heartbeat-config

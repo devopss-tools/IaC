@@ -1,0 +1,9 @@
+---
+- name: deploy nfs server
+  become: true
+  hosts: nfs-group
+  roles:
+    # deploy nfs storage
+   - { role: package, pkgs: ["nfs-utils"] }
+   - { role: nfs_config }
+   - { role: nfs_config }

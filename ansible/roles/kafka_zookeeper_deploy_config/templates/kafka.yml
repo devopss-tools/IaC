@@ -1,0 +1,7 @@
+service:
+  kafka:
+    enabled: true
+    running: true
+  zookeeper:
+    enabled: true
+    running: true

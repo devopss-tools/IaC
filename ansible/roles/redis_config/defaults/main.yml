@@ -1,0 +1,3 @@
+---
+goss_test_files: ["redis.yml"]
+monit_rules_files: ["redis.monit"]

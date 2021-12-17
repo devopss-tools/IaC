@@ -1,0 +1,39 @@
+---
+# nginx config
+- name: Deploy /etc/nginx/nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+  notify:
+    - nginx_restart
+    - nginx_enable
+
+#- debug:
+#    msg: ""
+#  with_items: "{{ nginx_config_virtulhost_files }}"
+
+# nginx config
+- name: Deploy nginx config files
+  template:
+    src: "{{env_name}}/{{ item.src }}"
+    dest: "/etc/nginx/conf.d/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+  with_items: "{{ nginx_config_virtulhost_files }}"
+  notify:
+    - nginx_reload
+
+- name: test nginx configuration files
+  shell: nginx -t
+  register: nginx_test_result
+  changed_when: nginx_test_result.rc != 0
+  failed_when: nginx_test_result.rc != 0
+
+- import_role:
+      name: selinux_policy_config

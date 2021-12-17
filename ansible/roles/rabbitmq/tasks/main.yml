@@ -1,0 +1,40 @@
+---
+- include: yum_erlang.yml
+  when: ansible_pkg_mgr == 'yum'
+
+# Setup/install tasks.
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+
+- name: RabbitMQ -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 5672 will fail if rebbitmq was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 5672
+    delay: 5
+    timeout: 60
+
+- name: Add rabbitmq admin user
+  rabbitmq_user:
+    user: admin
+    password: "{{vault_rabbitmq_admin_password}}"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    tags: administrator
+    state: present
+
+- name: import goss test role
+  import_role:
+    name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules

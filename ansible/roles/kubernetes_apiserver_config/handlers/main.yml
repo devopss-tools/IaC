@@ -1,0 +1,15 @@
+---
+- name: systemd_reload
+  shell: systemctl daemon-reload
+
+# enable kubeapi service
+- name: kube_apiserver_enable
+  service:
+    name: kube-apiserver
+    enabled: yes
+
+# restart kube-apiserver service
+- name: kube_apiserver_restart
+  service:
+    name: kube-apiserver
+    state: restarted

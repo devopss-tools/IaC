@@ -1,0 +1,15 @@
+---
+- name: systemd_reload
+  shell: systemctl daemon-reload
+
+# enable kube_control-manager service
+- name: kube_control_manager_enable
+  service:
+    name: kube-control-manager
+    enabled: yes
+
+# restart kube_control-manager service
+- name: kube_control_manager_restart
+  service:
+    name: kube-control-manager
+    state: restarted

@@ -1,0 +1,18 @@
+service:
+  filebeat:
+    enabled: true
+    running: true
+
+command:
+#Test filebeat version
+  /bin/filebeat version:
+    stdout:
+      - {{ filebeat_version }}
+    exit-status: 0
+    timeout: 1000
+#Test filebeat configurations
+  /bin/filebeat test config:
+    stdout:
+      - "Config OK"
+    exit-status: 0
+    timeout: 1000

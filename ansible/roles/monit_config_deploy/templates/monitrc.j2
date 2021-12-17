@@ -1,0 +1,56 @@
+#version 0.0.1
+
+set daemon 60   #check services ever 60 seconds
+  set logfile /var/log/monit.log
+  set idfile /var/lib/monit/id
+  set statefile /var/lib/monit/state
+
+#Event queue
+set eventqueue
+  basedir /var/lib/monit/events # set the base directory where events will be stored
+  slots 100                     # optionally limit the queue size
+
+##Mail settings
+#set mail-format {
+#  from: testmonitor@datacenter.eu
+#  subject: monit alert --  $EVENT
+#  message: $EVENT Service $SERVICE
+#                Date:        $DATE
+#                Action:      $ACTION
+#                Host:        $HOST
+#                Description: $DESCRIPTION
+#
+#           Your faithful employee,
+#           Monit }
+
+##set mailserver mail.datacenter.eu port 587
+#  username testmonitor@datacenter.eu password "4md8x8yGWd"
+#  using TLSV1 with timeout 30 seconds
+#
+#set alert *******.devopss@gmail.com #email address which will receive monit alerts
+
+#http settings
+set httpd port 2812 address 0.0.0.0  # allow connections on all adapters
+#    ssl enable
+#    pemfile  /var/certs/monit.pem
+    allow 0.0.0.0/0.0.0.0 # allow all IPs, can use local subnet too
+    allow admin:3njonr5vd9      # require user 'admin' with password 'wp-bullet'
+
+check system system-monitoring-{{ ansible_host }}
+  if loadavg (5min) > 3 then alert
+  if loadavg (15min) > 1 then alert
+  if memory usage > 80% for 4 cycles then alert
+  if swap usage > 20% for 4 cycles then alert
+  # Test the user part of CPU usage
+  if cpu usage (user) > 80% for 2 cycles then alert
+  # Test the system part of CPU usage
+  if cpu usage (system) > 20% for 2 cycles then alert
+  # Test the i/o wait part of CPU usage
+  if cpu usage (wait) > 80% for 2 cycles then alert
+  # Test CPU usage including user, system and wait. Note that
+  # multi-core systems can generate 100% per core
+  # so total CPU usage can be more than 100%
+  if cpu usage > 200% for 4 cycles then alert
+
+#allow modular structure
+include /etc/monit.d/*.monit

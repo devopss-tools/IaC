@@ -1,0 +1,28 @@
+linux_filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/nfs"} ]
+
+# Firewall settings
+firewalld_port:
+  nfs01:
+    port: 111
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  nfs02:
+    port: 2049
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  nfs03:
+    port: 111
+    protocol: udp
+    state: enabled
+    zone: public
+    permanent: true
+  nfs04:
+    port: 2049
+    protocol: udp
+    state: enabled
+    zone: public
+    permanent: true

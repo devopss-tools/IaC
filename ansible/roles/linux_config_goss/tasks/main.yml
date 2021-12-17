@@ -1,0 +1,58 @@
+---
+- name: download goss
+  get_url:
+    url: "{{ linux_config_goss_url }}"
+    dest: "/usr/local/sbin/goss"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: add group
+  group:
+    name: "{{ linux_config_goss_group_name }}"
+    state: present
+
+- name: add user
+  user:
+    name: "{{ linux_config_goss_user_name }}"
+    comment: "devopss , technical user for testing"
+    shell: /home/goss/goss.sh
+    groups: "{{ linux_config_goss_group_name }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+
+- name: Deploy goss shell
+  template:
+    src: goss.sh.j2
+    dest: /home/goss/goss.sh
+    owner: root
+    group: root
+    mode: "0755"
+    backup: yes
+
+- name: create folder for tests
+  file:
+    path: "/etc/goss.d"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: add ssh keys
+  authorized_key:
+    user: "{{ linux_config_goss_user_name }}"
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "pub_ssh_key/*"
+
+- name: add deploy into sudoers
+  template:
+    src: goss.j2
+    dest: "/etc/sudoers.d/goss"
+    owner: root
+    group: root
+    mode: "0400"
+    backup: yes

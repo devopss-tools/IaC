@@ -1,0 +1,6 @@
+---
+# restart pgbouncer service
+- name: pgbouncer_restart
+  service:
+    name: 'pgbouncer'
+    state: 'restarted'

@@ -1,0 +1,10 @@
+---
+- import_tasks: yum_package.yml
+  when: ansible_pkg_mgr == 'yum' and pkgs is defined
+
+- name: install via apt
+  fail: msg='Deployment for apt package manager is not impplemented yet'
+  when: ansible_pkg_mgr == 'apt' and pkgs is defined
+
+- import_tasks: pip_package.yml
+  when: pip_pkgs is defined and pip_pkgs != ""

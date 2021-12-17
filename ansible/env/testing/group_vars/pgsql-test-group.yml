@@ -1,0 +1,56 @@
+
+linux_filesystem_map: [
+  {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/pgsql"}
+]
+
+db_su_admin_name: "devopss_su_admin"
+devopss_su_admin_passwd: "{{ vault_pgsql_test_su_admin }}"
+db_name: "test_agg_db"
+
+devopss_db_admin_passwd: "{{ vault_pgsql_test_db_admin_passwd }}"
+devopss_db_user_passwd: "{{ vault_pgsql_test_db_user_passwd }}"
+
+
+pgsql_major_version: "12"
+pgsql_version: "{{ pgsql_major_version }}.0-1PGDG"
+
+# postgresql12-libs-12.0-1PGDG.rhel7.x86_64.rpm
+pgsql_libs_rpm: "postgresql{{ pgsql_major_version }}-libs-{{ pgsql_version }}.rhel{{ ansible_distribution_major_version }}.x86_64.rpm"
+pgsql_libs_rpm_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{devopss_nexus_port}}/repository/raw-repository/postgresql/{{ pgsql_major_version }}/redhat/{{pgsql_libs_rpm}}"
+
+# postgresql12-12.0-1PGDG.rhel7.x86_64.rpm
+pgsql_rpm: "postgresql{{ pgsql_major_version }}-{{ pgsql_version }}.rhel{{ ansible_distribution_major_version }}.x86_64.rpm"
+pgsql_rpm_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{devopss_nexus_port}}/repository/raw-repository/postgresql/{{ pgsql_major_version }}/redhat/{{pgsql_rpm}}"
+
+# postgresql12-server-12.0-1PGDG.rhel7.x86_64.rpm
+pgsql_server_rpm: "postgresql{{ pgsql_major_version }}-server-{{ pgsql_version }}.rhel{{ ansible_distribution_major_version }}.x86_64.rpm"
+pgsql_server_rpm_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{devopss_nexus_port}}/repository/raw-repository/postgresql/{{ pgsql_major_version }}/redhat/{{pgsql_server_rpm}}"
+
+# python2-psycopg2-2.8.3-3.rhel7.x86_64.rpm
+python_rpm: "python2-psycopg2-2.8.3-3.rhel7.x86_64.rpm"
+python_rpm_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{devopss_nexus_port}}/repository/raw-repository/postgresql/{{ pgsql_major_version }}/redhat/{{python_rpm}}"
+
+# postgresql12-contrib-12.0-1PGDG.rhel7.x86_64.rpm
+pgsql_contrib_rpm: "postgresql{{ pgsql_major_version }}-contrib-{{ pgsql_version }}.rhel{{ ansible_distribution_major_version }}.x86_64.rpm"
+pgsql_contrib_rpm_url: "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:{{devopss_nexus_port}}/repository/raw-repository/postgresql/{{ pgsql_major_version }}/redhat/{{pgsql_contrib_rpm}}"
+
+# Firewall settings
+firewalld_port:
+  pgsql:
+    port: 5432
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  pgsql-trusted:
+    port: 5432
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  pgsql-internal:
+    port: 5432
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true

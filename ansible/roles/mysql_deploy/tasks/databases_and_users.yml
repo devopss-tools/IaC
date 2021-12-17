@@ -1,0 +1,47 @@
+- name: Get root temp password
+  shell: "grep 'A temporary password is generated for root@localhost' /var/log/mysqld.log | tail -n 1 | awk -F ' ' '{print $(NF)}'"
+  register: root_password
+
+- set_fact:
+    mysql_temp_password: "{{ root_password.stdout }}"
+
+- name: update expired root user password
+  command: mysql --user root --password={{ mysql_temp_password }} --connect-expired-password --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password}}';"
+  when: "mysql_temp_password != ''"
+
+- name: Remove file (delete file)
+  ansible.builtin.file:
+    path: /var/log/mysqld.log
+    state: absent
+  when: "mysql_temp_password != ''"
+
+- name: GRANT root user permissions and allow hosts
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: root
+    password: "{{ mysql_root_password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: '%'
+#  vars:
+#    ansible_python_interpreter: "/usr/bin/python3"
+#    ansible_pip_interpreter: "/usr/bin/pip3"
+#    python_interpreter: "/usr/bin/python3"
+#    pip_interpreter: "/usr/bin/pip3"
+
+- name: GRANT Admin user permissions and allow hosts
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: myadmin
+    password: "{{ mysql_myadmin_password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: '%'
+
+- name: Create mysql database
+  mysql_db:
+    login_unix_socket: "{{ mysql_dir }}/mysql.sock"
+    name: mysql
+    state: present

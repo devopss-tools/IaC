@@ -1,0 +1,4 @@
+[Service]
+ExecStart=
+DOCKER_OPTS="--dns {{ DNS_SERVICE_IP }}"
+ExecStart=/usr/bin/dockerd -H unix:// -g {{ linux_filesystem_map.0.path }}/docker

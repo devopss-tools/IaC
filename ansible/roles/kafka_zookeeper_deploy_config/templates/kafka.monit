@@ -1,0 +1,11 @@
+check host localhost with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start kafka" with timeout 60 seconds
+  stop program = "/bin/systemctl stop kafka"
+  if failed port 9092 then exec "/etc/monit.d/monit2telegram Kafka"  repeat every 2 cycles
+  if failed port 9092 then restart every 5 cycles
+
+check host 127.0.0.1 with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start zookeeper" with timeout 60 seconds
+  stop program = "/bin/systemctl stop zookeeper"
+  if failed port 2181 then exec "/etc/monit.d/monit2telegram ZooKeeper"  repeat every 2 cycles
+  if failed port 2181 then restart every 5 cycles

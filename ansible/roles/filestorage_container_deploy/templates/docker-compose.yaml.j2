@@ -1,0 +1,26 @@
+version: '3'
+services:
+
+  test-Billing-File-Storage:
+    image: {{ FILE_STORAGE_DOCKER_IMAGE }}:{{FILE_STORAGE_DOCKER_IMAGE_TAG}}
+    hostname: billing-filestorage
+    tty: true
+#    dns:
+#    - 8.8.8.8
+    ports:
+      - 8039:8000
+    env_file:
+      - ./.env
+    restart: unless-stopped
+#    command: "gunicorn --workers=${GUNICORN_WORKERS} config.wsgi:application -b ${GUNICORN_BIND} --log-level info --timeout ${GUNICORN_TIMEOUT}"
+    networks:
+      - billing-filestorage-net
+
+networks:
+  billing-filestorage-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: {{ docker_network_cidr }}
+

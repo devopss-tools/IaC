@@ -1,0 +1,104 @@
+[test-group]
+#test-vm-test ansible_host=10.3.3.173
+devops-test-01 ansible_host=10.1.1.188
+
+[kafka-group:children]
+zk-test-group
+kafka-test-group
+kafka-test-agg-group
+
+[zk-test-group]
+#kafka-com-01 ansible_host=kafka-com-01.test.internal
+#kafka-com-02 ansible_host=kafka-com-02.test.internal
+#kafka-com-03 ansible_host=kafka-com-03.test.internal
+
+[zk-test-agg-group]
+
+[kafka-test-group]
+kafka-com-01 ansible_host=kafka-com-01.test.internal
+kafka-com-02 ansible_host=kafka-com-02.test.internal
+kafka-com-03 ansible_host=kafka-com-03.test.internal
+
+
+[kafka-test-agg-group]
+kafka-test-231-01 ansible_host=kafka-test-231-01.test.internal
+kafka-test-231-02 ansible_host=kafka-test-231-02.test.internal
+kafka-test-231-03 ansible_host=kafka-test-231-03.test.internal
+
+[etcd-group]
+k8sm01 ansible_host=k8sm01.test.internal
+k8sm02 ansible_host=k8sm02.test.internal
+k8sm03 ansible_host=k8sm03.test.internal
+
+[k8s-group:children]
+k8s-master-group
+k8s-worker-group
+
+[k8s-master-group]
+k8sm01 ansible_host=k8sm01.test.internal
+#k8sm02 ansible_host=k8sm02.test.internal
+#k8sm03 ansible_host=k8sm03.test.internal
+
+[k8s-worker-group]
+k8sw01 ansible_host=k8sw01.test.internal kubelet_config_pod_cidr=172.21.6.0/24
+k8sw02 ansible_host=k8sw02.test.internal kubelet_config_pod_cidr=172.21.7.0/24
+k8sw03 ansible_host=k8sw03.test.internal kubelet_config_pod_cidr=172.21.8.0/24
+k8sw04 ansible_host=k8sw04.test.internal kubelet_config_pod_cidr=172.21.9.0/24
+
+[pgsql-group:children]
+pgsql-agg-group
+pgsql-group
+
+[elasticsearch-group:children]
+es-test-group
+es-monitoring-group
+es-mapping-group
+
+[es-test-group]
+es-test-node-01 ansible_host=10.3.3.149
+es-test-node-02 ansible_host=10.3.3.178
+es-test-node-03 ansible_host=10.3.3.179
+es-test-node-04 ansible_host=10.3.3.180
+es7-11-test ansible_host=es7-11-shared.test.internal
+
+[gateway-group]
+nginx-proxy-01 ansible_host=10.3.3.187
+nginx-proxy-02 ansible_host=10.3.3.188
+nginx-proxy-03 ansible_host=10.3.3.189
+
+# For docker filestorage container and redis
+[storage-group]
+storage-01 ansible_host=10.3.3.190
+
+[rabbitmq-group]
+rbmq-shared-01 ansible_host=10.3.3.185
+rbmq388-emailcheck-prod ansible_host=10.3.3.45
+
+[nfs-group]
+nfs-01 ansible_host=nfs-01.test.internal
+
+[sftp-test-group]
+sftp-test ansible_host=67.207.73.191
+[sftp-files-group]
+file.devopss.internal ansible_host=10.3.3.36
+
+[sftp-group:children]
+sftp-test-group
+sftp-files-group
+
+[es-monitoring-group]
+es-monitoring-01 ansible_host=es-monitoring-01.test.internal
+es-monitoring-02 ansible_host=es-monitoring-02.test.internal
+es-monitoring-03 ansible_host=es-monitoring-03.test.internal node_master=true node_data="false"
+
+[es-mapping-group]
+es-mapping-01 ansible_host=es-mapping01.devopss.internal
+es-mapping-02 ansible_host=es-mapping02.devopss.internal
+es-mapping-03 ansible_host=es-mapping03.devopss.internal
+es-mapping-04 ansible_host=es-mapping04.devopss.internal
+
+[aria2-servers]
+aria2 ansible_host=10.3.3.94
+
+[localhost]
+localhost ansible_host=127.0.0.1 ansible_connection=local

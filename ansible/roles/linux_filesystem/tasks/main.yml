@@ -1,0 +1,63 @@
+---
+# check if mount point exist
+# mount_point.rc == 0 : mount point exist
+- name: stat if mount point {{item.path}} exist
+  command: mountpoint -q {{item.path}}
+  with_items: "{{ linux_filesystem_map }}"
+  register: mount_point
+  changed_when: "mount_point.rc == 0"
+  failed_when: no
+
+# Create a filesystem
+- name: Create filesystem
+  filesystem:
+    fstype: "{{ item.0.fstype }}"
+    dev: "{{ item.0.dev }}"
+  when: not item.1.changed and item.0.fstype != "nfs4"
+  with_together:
+    - "{{ linux_filesystem_map }}"
+    - "{{ mount_point.results }}"
+
+- name: create mount point
+  file:
+    path: "{{ item.0.path }}"
+    state: directory
+    recurse: "yes"
+    mode: "0755"
+    owner: root
+    group: root
+  when: not item.1.changed
+  with_together:
+    - "{{ linux_filesystem_map }}"
+    - "{{ mount_point.results }}"
+
+- name: Mount filesystem
+  mount:
+    path: "{{ item.0.path }}"
+    src: "{{ item.0.dev }}"
+    fstype: "{{ item.0.fstype }}"
+    state: mounted
+  when: not item.1.changed
+  with_together:
+    - "{{ linux_filesystem_map }}"
+    - "{{ mount_point.results }}"
+
+- name: Mount cron
+  cron:
+    name: "Mount {{  item.fstype }} cron - every hours at minute 0 "
+    minute: "0"
+    hour: "*"
+    job: "mount {{ item.path }}"
+  with_items: "{{ linux_filesystem_map }}"
+  when: item.fstype == "nfs4"
+  register: cron_mount_nfs_status
+  failed_when: cron_mount_nfs_status.failed == true
+
+- name: Add mount tests
+  template:
+    src: mount.yml.j2
+    dest: "/etc/goss.d/mount.yml"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: no

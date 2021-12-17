@@ -1,0 +1,13 @@
+---
+es_config_scripts_path : "/etc/elasticsearch/scripts"
+
+es_scripts_urls: [
+                   {
+                       url : "http://nexus.devopss.internal/repository/maven-releases/com/devopss/elasticsearch/script/edata-sink-es-merge/0.0.7-SNAPSHOTS/edata-sink-es-merge-0.0.7-SNAPSHOTS.groovy",
+                       name :  "edata-es-merge-script.groovy"
+                    },
+                   {
+                        url : "http://nexus.devopss.internal/repository/maven-releases/com/devopss/elasticsearch/script/edata-sink-es-compute/0.0.7-SNAPSHOTS/edata-sink-es-compute-0.0.7-SNAPSHOTS.groovy",
+                        name :  "edata-es-compute-script.groovy"
+                   }
+ ]

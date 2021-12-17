@@ -1,0 +1,33 @@
+upstream {{ finecredit.domain }} {
+     least_conn;
+     {% for var in upstream %}  server   {{ var.k8s_Ingress_Controller_Host }};
+     {% endfor %}
+    }
+server {
+    server_name {{ finecredit.domain }}   www.{{ finecredit.domain }};
+    location / {
+    client_max_body_size 20M;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    if (!-f $request_filename) {
+      return 301 https://$server_name$request_uri;
+      break;
+    }
+    add_header Set-Cookie cip=$remote_addr;
+    add_header Set-Cookie chost=$Host;
+    }
+}
+
+server {
+    server_name {{ finecredit.domain }} www.{{ finecredit.domain }};
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/{{ finecredit.domain }}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/{{ finecredit.domain }}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    location / {
+        proxy_max_temp_file_size 6144m;
+        proxy_pass http://{{ finecredit.domain }};
+    }
+}

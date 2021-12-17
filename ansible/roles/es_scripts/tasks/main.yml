@@ -1,0 +1,12 @@
+---
+# download es scripts
+
+- name: Deploy goss tests
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ es_config_scripts_path }}/{{ item.name }}"
+    owner: elasticsearch
+    group: elasticsearch
+    mode: 0744
+    force: yes
+  with_items: "{{ es_scripts_urls }}"

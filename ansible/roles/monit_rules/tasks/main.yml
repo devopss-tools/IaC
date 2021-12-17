@@ -1,0 +1,11 @@
+---
+- name: Deploy monit rules
+  template:
+    src: "{{ item }}"
+    dest: /etc/monit.d/
+    owner: root
+    group: root
+    mode: "0644"
+  with_items: "{{ monit_rules_files }}"
+  notify:
+    - monit_reload

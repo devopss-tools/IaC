@@ -1,0 +1,6 @@
+---
+# Basic settings
+config_path: "/etc/pgbouncer"
+auth_file: "{{ config_path }}/userlist.txt"
+
+goss_test_files: ["pgbouncer.yml"]

@@ -1,0 +1,17 @@
+- name: MONITORING':' HeartBeat copy config file
+  template:
+    src: "monitoring/heartbeat.yml.j2"
+    dest: "{{ nfs_monitoring_dir }}/heartbeat/heartbeat.yml"
+  tags: monitoring-heartbeat-rules
+
+- name: MONITORING':' HeartBeat copy TCP rules file
+  template:
+    src: "monitoring/heartbeat-rules-tcp.yml.j2"
+    dest: "{{ nfs_monitoring_dir }}/heartbeat/monitors.d/heartbeat-rules-tcp.yml"
+  tags: monitoring-heartbeat-rules
+
+- name: MONITORING':' HeartBeat copy HTTP/HTTPS rules file
+  template:
+    src: "monitoring/heartbeat-rules-http-https-{{heartbeat_version}}.yml.j2"
+    dest: "{{ nfs_monitoring_dir }}/heartbeat/monitors.d/heartbeat-rules-http-https.yml"
+  tags: monitoring-heartbeat-rules

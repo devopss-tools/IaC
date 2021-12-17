@@ -1,0 +1,8 @@
+galaxy_info:
+  author: devopss
+  description: configure Nexus Repository OSS
+  company: devopss 
+  license: devopss 
+  min_ansible_version: 3.18.1
+  galaxy_tags: []
+dependencies: []

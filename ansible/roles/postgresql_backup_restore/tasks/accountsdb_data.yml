@@ -1,0 +1,105 @@
+---
+- name: "Check Backup Directory, failed if does not exist"
+  stat:
+    path: "{{ pg_dir_target_from }}"
+  become: false
+  register: backup_dir_exists_status
+  tags: migrate_accounts_db
+  delegate_to: "{{ pg_accounts_host_from }}"
+  vars:
+    ansible_ssh_user: "{{ pg_ssh_user_from }}"
+    ansible_ssh_pass: "{{ pg_ssh_password_from }}"
+  failed_when: backup_dir_exists_status.stat.exists == false
+
+- name: "Check Backup File, Failed if exists"
+  stat:
+    path: "{{ pg_dir_target_from }}/globaldb-{{ pg_backup_version }}.gz"
+  become: false
+  register: backup_file_exists_status
+  tags: migrate_accounts_db
+  delegate_to: "{{ pg_accounts_host_from }}"
+  vars:
+    ansible_ssh_user: "{{ pg_ssh_user_from }}"
+    ansible_ssh_pass: "{{ pg_ssh_password_from }}"
+  failed_when: backup_file_exists_status.stat.exists == true
+
+- name: "Dump an existing database to a file (with compression)"
+  shell: "bash -c 'export PGPASSWORD={{ pg_accounts_login_password_from }} && \
+                   pg_dump  -Fc -C postgresql://postgres:@127.0.0.1:5432/globaldb --data-only -f {{ pg_dir_target_from }}/globaldb-{{ pg_backup_version }}.gz'"
+  tags: migrate_accounts_db
+  become: true
+  delegate_to: "{{ pg_accounts_host_from }}"
+  vars:
+    ansible_ssh_user: "{{ pg_ssh_user_from }}"
+    ansible_ssh_pass: "{{ pg_ssh_password_from }}"
+    ansible_sudo_pass: "{{ pg_ssh_password_from }}"
+  when: backup_dir_exists_status.stat.exists == true
+
+- name: "Synchronization of src on delegate host to dest on the current inventory host."
+  shell: "sshpass -v -p {{ pg_ssh_password_from }} scp -o StrictHostKeyChecking=no -r -P 22 {{ pg_ssh_user_from }}@{{ pg_accounts_host_from }}:{{ pg_dir_target_from }}/globaldb-{{ pg_backup_version }}.gz {{ pg_data_backup_dir }}"
+  register: backup_sync_status
+  tags: migrate_accounts_db
+
+- name: "Check Backup File, Failed if exists"
+  stat:
+    path: "{{ pg_data_backup_dir }}/globaldb-{{ pg_backup_version }}.gz"
+  become: false
+  register: backup_file_exists_status
+  tags: migrate_accounts_db
+  delegate_to: "{{ pg_accounts_host_from }}"
+  vars:
+    ansible_ssh_user: "{{ pg_ssh_user_from }}"
+    ansible_ssh_pass: "{{ pg_ssh_password_from }}"
+  failed_when: backup_file_exists_status.stat.exists == true
+
+- name: "Change owner"
+  file:
+    path: "{{ pg_dir_target_to }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    recurse: yes
+  delegate_to: "{{ pg_accounts_host_to }}"
+  tags: migrate_accounts_db
+
+- name: "Delete file Destination database host if exist"
+  file:
+    path: "{{ pg_dir_target_to }}/globaldb-{{ pg_backup_version }}.gz"
+    state: absent
+  delegate_to: "{{ pg_accounts_host_to }}"
+  tags: migrate_accounts_db
+
+- name: "Copy from Inventory Host to Destination database host"
+  shell: "sudo scp -i  /home/{{ ansible_ssh_user }}/.ssh/id_rsa_my {{ ansible_ssh_user }}@{{ pg_intermidiate_host_data }}:{{ pg_data_backup_dir }}/globaldb-{{ pg_backup_version }}.gz {{ pg_dir_target_to }}"
+  register: copy_restore_status
+  delegate_to: "{{ pg_accounts_host_to }}"
+  tags: migrate_accounts_db
+
+- name: "Restore Global DB data only"
+  postgresql_db:
+    name: "globaldb"
+    state: restore
+    target: "{{ pg_dir_target_to }}/globaldb-{{ pg_backup_version }}.gz"
+    login_host: "{{ pg_accounts_host_to }}"
+    login_password: "{{ pg_accounts_login_password_to }}"
+    login_user: "{{ pg_accounts_login_user_to }}"
+#    owner: "{{ pg_owner_to }}"
+  delegate_to: "{{ pg_accounts_host_to }}"
+  register: restore_globaldb_status
+  tags: migrate_accounts_db
+
+######
+#- name: Synchronization of src on delegate host to dest on the current inventory host.
+#  synchronize:
+#    mode: push
+#    src: "{{ pg_dir_target_from }}/globaldb-{{ pg_backup_version }}.gz"
+#    dest: "{{ pg_data_backup_dir }}"
+##  become: false
+#  register: backup_sync_status
+#  tags: migrate_accounts_db
+#  delegate_to: "{{ pg_accounts_host_from }}"
+#  vars:
+#    ansible_ssh_user: "{{ pg_ssh_user_from }}"
+#    ansible_ssh_pass: "{{ pg_ssh_password_from }}"
+#    ansible_sudo_pass: "{{ pg_ssh_password_from }}"

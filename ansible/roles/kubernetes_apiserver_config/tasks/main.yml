@@ -1,0 +1,113 @@
+---
+- name: Check if exist k8s API Server certificates
+  local_action: "shell if [ -f {{ k8s_certificate_root_path }}/kubernetes.pem ] && \
+                          [ -f {{ k8s_certificate_root_path }}/kubernetes-key.pem ] ; \
+                      then echo API Server files exist; fi "
+  register: result
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+#                          [ -f {{ k8s_certificate_root_path }}/encryption-config.yaml ]; \
+
+- local_action: "shell head -c 32 /dev/urandom | base64"
+  register: key_result
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+
+- name: Set k8s_encrypt_secret_key variable
+  set_fact:
+    k8s_encrypt_secret_key: "{{ key_result.stdout }}"
+  when: result.stdout == ""
+
+- name: Create {{ k8s_certificate_root_path }} directory, if it does not exist
+  local_action: "shell if [ ! -d {{ k8s_certificate_root_path }} ]; then mkdir -p {{ k8s_certificate_root_path }}; fi"
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+
+- name: Create configuration csr file
+  local_action: "template src=kubernetes-csr.json.j2 dest={{ k8s_certificate_root_path }}/kubernetes-csr.json"
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+
+- name: Create k8s certificate and access key
+  local_action: "shell {{ binaries_root_path }}/cfssl gencert -ca={{ ca_certificate_file }} \
+                                    -ca-key={{ ca_key_path }} \
+                                    -config={{ certificate_config }} \
+                                    -profile=kubernetes \
+                                    {{ k8s_certificate_root_path }}/kubernetes-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ k8s_certificate_root_path }}/kubernetes"
+  when: result.stdout == ""
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+
+- name: copy kubernetes certs files
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/kubernetes/
+    owner: root
+    mode: "0644"
+  with_items:
+    - "{{ ca_certificate_root_path }}/ca.pem"
+    - "{{ ca_certificate_root_path }}/ca-key.pem"
+    - "{{ k8s_certificate_root_path }}/kubernetes.pem"
+    - "{{ k8s_certificate_root_path }}/kubernetes-key.pem"
+    - "{{ etcd_certificate_root_path }}/etcd-key.pem"
+    - "{{ etcd_certificate_root_path }}/etcd.pem"
+#    - "{{ k8s_certificate_root_path }}/encryption-config.yaml"
+
+- name: copy etcd certs files
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/kubernetes/etcd_certs/
+    owner: root
+    mode: "0644"
+  with_items:
+    - "{{ etcd_certificate_root_path }}/etcd-key.pem"
+    - "{{ etcd_certificate_root_path }}/etcd.pem"
+
+- name: Create kubeapi group
+  group:
+    name: kubeapi
+    state: present
+
+- name: Create kubeapi user
+  user:
+    name: kubeapi
+    shell: /bin/bash
+    groups: kubeapi
+    append: yes
+    state: present
+
+- name: Copy kube-apiserver config files
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: kubeapi
+    group: kubeapi
+  with_items:
+     - "{{ kubernetes_apiserver_config_datadir }}"
+     - "/var/run/kubernetes"
+     - "/home/kubeapi"
+
+- name: Create kube-apiserver service
+  template:
+    src: kube-apiserver.service.j2
+    dest: "/etc/systemd/system/kube-apiserver.service"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: yes
+
+- name: import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Import monit alert rules
+  import_role:
+    name: monit_rules
+
+- name: import goss tests tasks
+  import_role:
+    name: goss_test
+  tags: "k8smaster_goss_tests"

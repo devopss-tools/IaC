@@ -1,0 +1,13 @@
+upstream {{ notfound.domain }} {
+     least_conn;
+     {% for var in upstream %}  server   {{ var.k8s_Ingress_Controller_Host }};
+     {% endfor %}
+    }
+server {
+    listen 80;
+    server_name {{ notfound.domain }};
+    location / {
+        proxy_max_temp_file_size 6144m;
+        proxy_pass http://{{ notfound.domain }};
+    }
+}

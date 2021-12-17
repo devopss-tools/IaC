@@ -1,0 +1,14 @@
+server {
+    server_name {{ whmcs_datacenter.domain }};
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_max_temp_file_size 144m;
+        proxy_pass http://10.1.1.89:3000;
+    }
+
+}
+
+

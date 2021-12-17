@@ -1,0 +1,24 @@
+---
+- name: deploy docker
+  become: true
+  hosts:
+    - docker-group
+    - storage-group
+    - k8s-worker-group
+    - test-group
+    - gitlab-runners-group
+
+  roles:
+    - { role: package, pkgs: [ "python3"],  tags: [ "docker_deploy"] }
+    - { role: package, pip_pkgs: [ "setuptools", "wheel", "setuptools-rust", "cryptography<=3", "pymysql", "PyMySQL"],  tags: [ "docker_deploy"], ansible_python_interpreter: "/usr/bin/python3", ansible_pip_interpreter: "/usr/bin/pip3" }
+    - { role: package, pip_pkgs: [ "docker-compose"],  tags: [ "docker_deploy"], ansible_python_interpreter: "/usr/bin/python3", ansible_pip_interpreter: "/usr/bin/pip3" }
+    - { role: package, pkgs: ["yum-utils", "device-mapper-persistent-data", "lvm2", "python3", "python3-pip", "net-tools", "telnet", "nano" ] , tags: [ "docker_deploy"]}
+    - { role: package_repo,
+             repo:
+                [
+                  {"name" : "docker", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/yum-ropo-configfiles/nexus.repo"}
+                ],
+              tags: [ "docker_deploy"]
+      }
+    - { role: package, pkgs: ["docker-ce-{{ docker_version }}-3.el7", "docker-ce-cli-{{ docker_version }}-3.el7", "containerd.io"] , tags: [ "docker_deploy"]}
+    - { role: docker_deploy_config, tags: [ "docker_config"]}

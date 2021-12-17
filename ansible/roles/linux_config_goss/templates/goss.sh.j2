@@ -1,0 +1,2 @@
+#!/bin/bash
+find /etc/goss.d/ -type f -name *.yml | xargs -I {} sudo /usr/local/sbin/goss -g {} validate -f documentation

@@ -1,0 +1,40 @@
+- name: Config - Deploy configuration exports
+  template:
+    src: exports.j2
+    dest: "/etc/exports"
+    owner: nfsnobody
+    group: nfsnobody
+    mode: "0600"
+    backup: yes
+
+- name: Config - Exports from file exports
+  shell: "exportfs -avr"
+
+- name: Config - nfs_start
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  with_items:
+    - rpcbind
+    - nfs-server
+    - nfs-lock
+    - nfs-idmap
+
+- name: NFS Config -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Config - Check if the service is running on port 2049 will fail if NFS was not installed correctly
+  wait_for:
+    host: "{{ansible_currentHost_fact_ip}}"
+    port: 2049
+    delay: 5
+    timeout: 60
+
+- name: import goss tests
+  import_role:
+      name: goss_test
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules

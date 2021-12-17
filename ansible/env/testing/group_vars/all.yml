@@ -1,0 +1,47 @@
+---
+# Declare ssh user
+# Declare ssh user
+ansible_ssh_user: "deploy"
+#ansible_ssh_user: "root"
+#ansible_sudo_ssh_user: "root"
+#ansible_sudo_pass: "{{ vault_ssh_root_user_default_password }}"
+#ansible_ssh_pass: "{{ vault_ssh_root_user_default_password }}"
+
+# Declare global linux file system
+linux_filesystem_map: []
+storage_dir: "/var/lib/storage"
+nfs_storage_dir: "/var/lib/nfs"
+
+# Declare global Nexus Registry OSS v3 domain name
+devopss_internal_nexus_address_name: "nexus-devopss-prod-01.devopss.net"
+devopss_nexus_user_repo: "devopss-repo-admin:{{ vault_devopss_nexus_user_pass }}"
+devopss_nexus_port: "8081"
+OU: "devopss"
+binaries_root_path: "{{ ansible_root_path }}/../bin"
+certificates_root_path: "{{ ansible_root_path }}/certificates/{{ env_name }}"
+ca_certificate_root_path: "{{ certificates_root_path }}"
+certificate_config: "{{ certificates_root_path }}/ca-config.json"
+ca_certificate_file : "{{ certificates_root_path }}/ca.pem"
+ca_certificate_file_target: "{{ansible_root_path}}/../target/certificates/{{env_name}}/ca.pem"
+ca_key_path : "{{ certificates_root_path }}/ca-key.pem"
+ca_key_path_target: "{{ansible_root_path}}/../target/certificates/{{env_name}}/ca-key.pem"
+certificates_root_path_target: "{{ansible_root_path}}/../target/certificates/{{env_name}}"
+
+###  {{ hostvars[ansible_host]['ansible_default_ipv4']['address'] }}
+#ansible_currentHost_fact_hostname: "{{ hostvars[inventory_hostname].ansible_hostname }}"
+#ansible_currentHost_fact_ip: "{{ hostvars[inventory_hostname].ansible_host }}"
+ansible_currentHost_fact_ip: "{{ ansible_eth0.ipv4.address }}"
+ansible_currentHost_fact_hostname: "{{ ansible_currentHost_fact_ip }}"
+
+# For ElasticSearch migrting data from 10.1.1.* subnet
+#ansible_currentHost_fact_ip: "{{ ansible_eth1.ipv4.address }}"
+
+##### k8s Ingress Controller Parameters #####
+ingress_version: "0.26.1"
+ingress_user: "33"
+ingressExternalIPs: ["10.3.3.141", "10.3.3.151", "10.3.3.166"]
+ingressReplSetNr: 3
+k8s_nfs_hostname: "nfs-01.test.internal"
+k8s_nfs_server_storage_path: "/var/lib/nfs/data-volumes/k8s-volumes"
+
+k8s_dashboard_version: "v1.10.1"

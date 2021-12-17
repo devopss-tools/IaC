@@ -1,0 +1,5 @@
+---
+- hosts: redis-group
+  roles:
+    - zabbix-install
+  become: true

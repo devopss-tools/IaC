@@ -1,0 +1,15 @@
+---
+- name: Create CNI directory if it doesn"t exist
+  file:
+    path: "{{ cni_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+# Download cni
+- name: Download cni
+  unarchive:
+    src: "{{ cni_install_url }}"
+    dest: "/opt/cni/bin"
+    remote_src: yes

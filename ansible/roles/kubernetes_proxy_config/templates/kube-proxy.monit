@@ -1,0 +1,5 @@
+check host 127.0.0.1 with address 0.0.0.0
+  start program = "/bin/systemctl start kube-proxy" with timeout 60 seconds
+  stop program = "/bin/systemctl stop kube-proxy"
+  if failed port 10256 then exec "/etc/monit.d/monit2telegram"  repeat every 2 cycles
+  if failed port 10256 then restart every 5 cycles

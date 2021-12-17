@@ -1,0 +1,33 @@
+---
+# pgbouncer.ini
+- name: Create pgbouncer.ini
+  template:
+    src: 'pgbouncer.ini.j2'
+    dest: '{{ config_path }}/pgbouncer.ini'
+    owner: pgbouncer
+    group: pgbouncer
+    mode: "0600"
+    backup: yes
+  notify:
+    - pgbouncer_restart
+
+# userlist.txt
+- name: Add userlist.txt
+  template:
+    src: 'userlist.txt.j2'
+    dest: '{{ auth_file }}'
+    owner: pgbouncer
+    group: pgbouncer
+    mode: "0600"
+  # notify:
+  #   - pgbouncer_restart
+
+- name: Ensure pgbouncer is started    enabled
+  service:
+    name: 'pgbouncer'
+    state: 'started'
+    enabled: yes
+
+- import_role:
+      name: goss_test
+

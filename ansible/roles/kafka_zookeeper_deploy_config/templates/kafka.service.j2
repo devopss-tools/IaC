@@ -1,0 +1,23 @@
+[Unit]
+Description=Apache Kafka
+Documentation=http://kafka.apache.org/documentation.html
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+User=kafka  
+Group=kafka
+Environment="LOG_DIR={{ kafka_log_dir }}"
+Environment="LOG_DIR={{ kafka_log_dir }}"
+{% if kafka_auth is defined %}
+Environment="KAFKA_OPTS=-Djava.security.auth.login.config={{ zk_home }}/config/kafka_server_jaas.conf -Djava.net.preferIPv4Addresses=true -Djava.net.preferIPv4Stack=true"
+{% endif %}
+{% if kafka_auth is not defined %}
+Environment="KAFKA_OPTS=-Djava.net.preferIPv4Addresses=true -Djava.net.preferIPv4Stack=true"
+{% endif %}
+ExecStart={{ kafka_install_dir }}/bin/kafka-server-start.sh {{ kafka_install_dir }}/config/server.properties
+ExecStop={{ kafka_install_dir }}/bin/kafka-server-stop.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+[Unit]
+Description=Apache ZooKeeper
+After=network.target
+ConditionPathExists={{ zk_home }}/config/zookeeper.properties
+
+[Service]
+Type=simple
+User={{ kafka_os_user }}
+Group={{ kafka_os_group }}
+SyslogIdentifier=zookeeper
+WorkingDirectory={{ zk_datadir }}
+Environment="ZOO_LOG_DIR={{ zk_logs }}"
+Environment="LOG_DIR={{ zk_logs }}"
+{% if kafka_auth is defined %}
+Environment="KAFKA_OPTS=-Djava.security.auth.login.config={{ zk_home }}/config/zookeeper_jaas.conf"
+{% endif %}
+ExecStart={{ zk_home }}/bin/zookeeper-server-start.sh {{ zk_home }}/config/zookeeper.properties
+ExecStop={{ zk_home }}/bin/zookeeper-server-stop.sh
+ExecReload={{ zk_home }}/bin/zkServer.sh restart
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

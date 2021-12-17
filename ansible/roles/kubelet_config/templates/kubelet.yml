@@ -1,0 +1,32 @@
+service:
+  kubelet:
+    enabled: true
+    running: true
+
+command:
+#Test kubelet version
+  /usr/local/sbin/kubelet --version:
+    stdout:
+      - {{ k8s_version }}
+    exit-status: 0
+    timeout: 100000
+#Test cluster info
+  /usr/local/sbin/kubectl cluster-info --kubeconfig /var/lib/kubernetes/kubelet/kubeconfig:
+    stdout:
+      - /Kubernetes master/
+      - /is running/
+    exit-status: 0
+    timeout: 100000
+#Test kubelet health on http
+  /bin/curl http://127.0.0.1:10248/healthz:
+    stdout:
+      - ok
+    exit-status: 0
+    timeout: 1000
+#Test check node ready
+  /usr/local/sbin/kubectl get nodes --kubeconfig /var/lib/kubernetes/kubelet/kubeconfig | grep {{ ansible_currentHost_fact_hostname }}:
+    stdout:
+      - {{ ansible_currentHost_fact_hostname }}
+      - Ready
+    exit-status: 0
+    timeout: 100000

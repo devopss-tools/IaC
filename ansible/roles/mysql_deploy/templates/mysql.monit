@@ -1,0 +1,5 @@
+check host 127.0.0.1 with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start mysqld" with timeout 60 seconds
+  stop program = "/bin/systemctl stop mysqld"
+      if failed port 3306 then exec "/etc/monit.d/monit2telegram MySql"  repeat every 2 cycles
+  if failed port 3306 then restart every 5 cycles

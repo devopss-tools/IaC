@@ -1,0 +1,148 @@
+#---
+#- name: create docker service folder
+#  file:
+#    path: "/etc/systemd/system/docker.service.d/"
+#    state: directory
+#    mode: "0644"
+#    owner: root
+#    group: root
+#    recurse: yes
+#
+#- name: create docker service additional config file
+#  template:
+#    src: "docker_service.override.conf.j2"
+#    dest: "/etc/systemd/system/docker.service.d/override.conf"
+#    owner: root
+#    group: root
+#    mode: "0644"
+#    backup: yes
+#    force: yes
+##  with_together:
+##    - "{{ linux_filesystem_map }}"
+#
+#- name: systemd_reload
+#  shell: systemctl daemon-reload
+#
+#- name: ensure docker is running
+#  service:
+#    name: docker
+#    state: restarted
+#
+#- name: Copy kubelet config certificate file
+#  local_action: template src="kubelet-csr.json.j2" dest="{{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}-csr.json"
+#  become_user: "{{ lookup('env','USER') }}"
+#
+#- name: Copy/decrypt CA file
+#  local_action: template src="{{ ca_certificate_file }}" dest="{{ ca_certificate_file }}"
+#  become_user: "{{ lookup('env','USER') }}"
+#
+#- name: Copy/decrypt CA key file
+#  local_action: template src="{{ ca_key_path }}" dest="{{ ca_key_path }}"
+#  become_user: "{{ lookup('env','USER') }}"
+#
+#- name: Generate kubelet certificate and access key
+#  local_action: "shell {{ binaries_root_path }}/cfssl gencert -ca={{ ca_certificate_file }} \
+#                                    -ca-key={{ ca_key_path }} \
+#                                    -config={{ certificate_config }} \
+#                                    -profile=kubernetes \
+#                                    -hostname={{ ansible_currentHost_fact_hostname }},{{ ansible_currentHost_fact_ip }} \
+#                                    {{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}-csr.json | {{ binaries_root_path }}/cfssljson -bare {{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}"
+#  become_user: "{{ lookup('env','USER') }}"
+##  with_items: "{{ groups['k8s-master-group'] }}"
+#
+###### Configure kubelet.kubeconfig
+#
+#- name: Kubectl - Configure access to cluster
+#  local_action: "shell kubectl config set-cluster kubernetes-{{item}} \
+#                                    --server=https://{{ hostvars[item]['ansible_host'] }}:6443 \
+#                                    --embed-certs=true \
+#                                    --certificate-authority={{ ca_certificate_file }} \
+#                                    --kubeconfig={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.kubeconfig"
+#  become_user: "{{ lookup('env','USER') }}"
+#  with_items: "{{ groups['k8s-master-group'] }}"
+#
+##                                    --server=https://{{groups['k8s-master-group'][0]}}:6443 \
+##                                    --kubeconfig={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.kubeconfig"
+#
+#- name: Kubectl - Set credentials for access cluster
+#  local_action: "shell kubectl config set-credentials system:node:{{ ansible_currentHost_fact_hostname }} \
+#                                    --embed-certs=true \
+#                                    --client-certificate={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.pem \
+#                                    --client-key={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}-key.pem \
+#                                    --kubeconfig={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.kubeconfig"
+#  become_user: "{{ lookup('env','USER') }}"
+#  with_items: "{{ groups['k8s-master-group'] }}"
+#
+#- name: Kubectl - Set context
+#  local_action: "shell kubectl config set-context default-{{item}} \
+#                                    --cluster=kubernetes-{{item}} \
+#                                    --user=system:node:{{ ansible_currentHost_fact_hostname }} \
+#                                    --kubeconfig={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.kubeconfig"
+#
+#  become_user: "{{ lookup('env','USER') }}"
+#  with_items: "{{ groups['k8s-master-group'] }}"
+#
+#
+#- name: Kubectl - use context
+#  local_action: "shell kubectl config use-context default-{{ groups['k8s-master-group'][3 | random] }} --kubeconfig={{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.kubeconfig"
+#  become_user: "{{ lookup('env','USER') }}"
+#
+#- name: create config folder
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#    mode: "0755"
+#    owner: root
+#    group: root
+#    recurse: yes
+#  with_items:
+#     - "/var/lib/kubernetes/kubelet"
+#
+#- name: Copy certificates files
+#  copy:
+#    src: "{{ item }}"
+#    dest: /var/lib/kubernetes/kubelet/
+#    owner: root
+#    mode: "0644"
+#  with_items:
+#     - "{{ ca_certificate_root_path }}/ca.pem"
+#     - "{{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}-key.pem"
+#     - "{{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.pem"
+#
+#- name: create kublete service
+#  template:
+#    src: kubelet.service.j2
+#    dest: "/etc/systemd/system/kubelet.service"
+#    owner: root
+#    group: root
+#    mode: "0644"
+#    backup: yes
+#
+#- name: config file
+#  template:
+#    src: "{{ k8s_certificate_root_path }}/{{ ansible_currentHost_fact_hostname }}.kubeconfig"
+#    dest: "/var/lib/kubernetes/kubelet/kubeconfig"
+#    owner: root
+#    group: root
+#    mode: "0644"
+#    backup: yes
+
+- name: docker logout
+  command: "docker logout {{ gitlab_docker_registry_url }}:{{ gitlab_docker_registry_port }}"
+#  when: env_name == "dev"
+
+- name: docker login
+  command: "docker login {{ gitlab_docker_registry_url }}:{{ gitlab_docker_registry_port }} -u {{ gitlab_docker_registry_user }} --password {{ gitlab_docker_registry_user_token }}"
+#  when: env_name == "dev"
+
+#- name: import handlers tasks
+#  import_tasks: handlers/main.yml
+#
+#- name: Import monit alert rules
+#  import_role:
+#    name: monit_rules
+#
+- name: import goss tests tasks
+  import_role:
+    name: goss_test
+  tags: "k8sworker_goss_tests"

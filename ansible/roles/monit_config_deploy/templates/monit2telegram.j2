@@ -1,0 +1,6 @@
+#!/bin/bash
+
+curl -X POST --silent --retry 5 --retry-delay 0 --retry-max-time 60 \
+  --data-urlencode "chat_id={{vault_telegram_chat_id}}" \
+  --data-urlencode   "text={{ env_name }} ALERT: Check Service on {{inventory_hostname}} / {{ansible_currentHost_fact_ip}} / $1 / $2 / $3" \
+  "https://api.telegram.org/bot{{vault_telegram_bot_token}}/sendMessage?disable_web_page_preview=true"

@@ -1,0 +1,6 @@
+---
+postgresql_logs_dir: "/var/log/pgsql"
+postgresql_initdb_pgdata: "/var/lib/pgsql/12/data"
+postgresql_initdb_pwfile: "/var/lib/pgsql/12/{{ postgresql_initdb_admin }}.pwfile"
+postgresql_initdb_profile: "/var/lib/pgsql/.pgsql_profile"
+postgresql_initdb_cmd: "/usr/pgsql-12/bin/initdb -E UTF8  --pwfile={{ postgresql_initdb_pwfile }}  -U {{ postgresql_initdb_admin }} -A password -D {{ postgresql_initdb_pgdata }}"

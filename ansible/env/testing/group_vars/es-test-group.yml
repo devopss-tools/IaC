@@ -1,0 +1,43 @@
+linux_filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/elasticsearch"} ]
+
+es_cluster_name: "es-monitoring-cluster"
+es_group: "es-test-group"
+es_group_length: "{{ groups['es-test-group'] | length }}"
+es_major_version: "7.x"
+es_version: "7.5.0"
+jdk_url: "java-jdk/8u202/jdk-8u202-linux-x64.rpm"
+es_url: "elasticsearch/{{ es_version }}/elasticsearch-{{ es_version }}-x86_64.rpm"
+script_enable: false
+
+# Firewall settings
+firewalld_port:
+  es-commun:
+    port: 9200
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  es-commun-pub:
+    port: 9200
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  es-commun-internal:
+    port: 9200
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true
+  es-transp:
+    port: 9300
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+  es-transp-internal:
+    port: 9300
+    protocol: tcp
+    state: enabled
+    zone: internal
+    permanent: true

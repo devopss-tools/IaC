@@ -1,0 +1,33 @@
+---
+- name: postfix_enable
+  service:
+    name: postfix
+    enabled: no
+
+# restart haproxy service
+- name: postfix_reload
+  service:
+    name: postfix
+    state: stopped
+
+- name: Create haproxy.conf file
+  template:
+    src: "haproxy.cfg.j2"
+    dest: "/etc/haproxy/haproxy.cfg"
+
+- name: Test HAProxy configuration files
+  shell: haproxy -c -V -f /etc/haproxy/haproxy.cfg
+  register: haproxy_test_result
+  changed_when: haproxy_test_result.rc != 0
+  failed_when: haproxy_test_result.rc != 0
+
+- name: ES {{ es_version }} -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: import monit alert rules
+  import_role:
+    name: monit_rules
+
+- name: import goss test role
+  import_role:
+    name: goss_test

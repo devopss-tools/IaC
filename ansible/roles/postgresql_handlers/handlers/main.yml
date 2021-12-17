@@ -1,0 +1,19 @@
+---
+# enable postgresql service
+- name: pg_enable
+  service:
+    name: postgresql-12
+    enabled: yes
+
+# restart postgresql service
+- name: pg_restart
+  service:
+    name: postgresql-12
+    state: restarted
+  when: postgresql_handlers_action == "restart"
+
+# reload postgresql service
+- name: pg_reload
+  service:
+    name: postgresql-12
+    state: reloaded

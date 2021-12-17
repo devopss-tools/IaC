@@ -1,0 +1,34 @@
+mailu_version: "1.8"
+
+mailu_domain: "mail.devopss.io"
+mailu_hostname: "mail.devopss.io"
+
+#db_host: "10.1.1.164:3306"
+db_host: "10.1.1.164"
+db_port: "3306"
+db_name: "mailu"
+db_user: "myadmin"
+db_password: "{{ vault_mail_mysql_admin_password }}"
+
+redis_host: "10.1.1.164"
+#redis_host: "mailu-dbs-01.devopss.internal"
+
+mailu_account_passwd: "{{ vault_mailu_account_passwd }}"
+secret_key: "{{ vault_mail_secret_key }}"
+
+front_k8s_svc_ip: "172.20.253.245"
+imap_k8s_svc_ip: "172.20.50.103"
+smtp_k8s_svc_ip: "172.20.50.104"
+webmail_k8s_svc_ip: "172.20.50.105"
+admin_k8s_svc_ip: "172.20.50.102"
+webdav_k8s_svc_ip: "172.20.50.106"
+antispam_k8s_svc_ip: "172.20.50.107"
+antivirus_k8s_svc_ip: "172.20.50.108"
+
+pop3_node_port: "30110"
+pop3s_node_port: "30995"
+imap_node_port: "30143"
+imaps_node_port: "30993"
+smtp_node_port: "30025"
+smtps_node_port: "30465"
+smtpd_node_port: "30587"

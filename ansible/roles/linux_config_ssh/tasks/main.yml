@@ -1,0 +1,28 @@
+---
+- name: SSH Port
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^Port"
+              line="Port 22"
+              state=present
+  notify: ssh_restart
+
+- name: Protocol version
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^Protocol"
+              line="Protocol 2"
+              state=present
+  notify: ssh_restart
+
+- name: no root access via SSH
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PermitRootLogin"
+              line="PermitRootLogin no"
+              state=present
+  notify: ssh_restart
+
+- name: no password authentication
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PasswordAuthentication"
+              line="PasswordAuthentication no"
+              state=present
+  notify: ssh_restart

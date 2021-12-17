@@ -1,0 +1,8 @@
+galaxy_info:
+  author: devopss
+  description: postgresql backup restore
+  company: devopss 
+  license: devopss 
+  min_ansible_version: 1.2
+  galaxy_tags: []
+dependencies: ['postgresql_handlers']

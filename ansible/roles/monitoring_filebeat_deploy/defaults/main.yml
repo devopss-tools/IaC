@@ -1,0 +1,4 @@
+filebeat_version: "7.7.0"
+es_monitoring_host: "{{ hostvars[groups['es-monitoring-group'][0]].ansible_host }}"
+es_monitoring_port: "9200"
+goss_test_files: ["filebeat.yml"]

@@ -1,0 +1,28 @@
+linux_filesystem_map: [
+  {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/data"}
+]
+
+mysql_dir: "{{ linux_filesystem_map.0.path }}/mysql"
+
+mysql_version: "8.0.21"
+
+mysql_root_password: "{{ vault_mail_mysql_root_password }}"
+mysql_myadmin_password: "{{ vault_mail_mysql_admin_password }}"
+
+# Firewall settings
+firewalld_port:
+  mysql:
+    port: 3606
+    protocol: tcp
+    state: enabled
+    zone: trusted
+    permanent: true
+
+#mysql:
+#  root:
+#    password: "{{ vault_mail_mysql_root_password }}"
+#  hosts:
+#    - "{{ ansible_currentHost_fact_ip }}"
+#    - 127.0.0.1
+#    - ::1
+#    - localhost

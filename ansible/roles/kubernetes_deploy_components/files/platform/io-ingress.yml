@@ -1,0 +1,347 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/client-max-body-size: 200m
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 100m
+    nginx.ingress.kubernetes.io/proxy-next-upstream: http_504
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: 180s
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: '3'
+    nginx.ingress.kubernetes.io/session-cookie-expires: '172800'
+    nginx.ingress.kubernetes.io/session-cookie-max-age: '172800'
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.org/proxy-connect-timeout: 60s
+    nginx.org/proxy-read-timeout: 180s
+    nginx.org/proxy-send-timeout: 180s
+  labels:
+    app: devopss-io-platform
+    environment: production
+    project: devopss-io-platform
+  name: fs-api-dev-devopss-io
+  namespace: devopss-platform
+spec:
+  rules:
+  - host: fs.api.dev.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: core-upload-api-service
+          servicePort: 80
+        path: /
+  - host: fs.api.dev.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: core-upload-api-service
+          servicePort: 80
+        path: /*
+
+########################################################
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app: devopss-io-platform
+    environment: production
+    project: devopss-io-platform-ui
+  name: devopss-io-ingress
+  namespace: devopss-platform
+spec:
+  rules:
+#### Account UI
+  - host: account.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: core-account-ui-service
+          servicePort: 80
+        path: /
+#### Organizations UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: core-organization-ui-service
+          servicePort: 80
+        path: /
+
+########################################################
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  labels:
+    app: devopss-io-platform
+    environment: production
+    project: devopss-io-platform
+  name: devopss-io-ingress-auth-ui-paths-rewrite
+  namespace: devopss-platform
+spec:
+  rules:
+
+#### Auth UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-auth-ui-service
+          servicePort: 80
+        path: /apps/auth(/|$)(.*)
+#### CMS UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-cms-ui-service
+          servicePort: 80
+        path: /apps/cms(/|$)(.*)
+
+#### Monitoring UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-monitoring-ui-service
+          servicePort: 80
+        path: /apps/monitoring(/|$)(.*)
+
+#### SmartProcess UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-smartprocess-ui-service
+          servicePort: 80
+        path: /apps/smart-process(/|$)(.*)
+
+#### Rocket Designer UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-rocket-designer-ui-service
+          servicePort: 80
+        path: /apps/rocket-designer(/|$)(.*)
+
+#### Rocket Executor UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-rocket-executor-ui-service
+          servicePort: 80
+        path: /apps/rocket-app(/|$)(.*)
+
+#### Calendar UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-calendar-ui-service
+          servicePort: 80
+        path: /apps/calendar(/|$)(.*)
+
+#### Chat UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-chat-webrtc-service
+          servicePort: 80
+        path: /apps/chat(/|$)(.*)
+
+#### mail UI
+  - host: '*.devopss.io'
+    http:
+      paths:
+      - backend:
+          serviceName: app-mail-ui-service
+          servicePort: 80
+        path: /apps/mail(/|$)(.*)
+
+########################################################
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/client-max-body-size: 200m
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 100m
+    nginx.ingress.kubernetes.io/proxy-next-upstream: http_504
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: 180s
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: '3'
+    nginx.ingress.kubernetes.io/session-cookie-expires: '172800'
+    nginx.ingress.kubernetes.io/session-cookie-max-age: '172800'
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.org/proxy-connect-timeout: 60s
+    nginx.org/proxy-read-timeout: 180s
+    nginx.org/proxy-send-timeout: 180s
+  labels:
+    app: devopss-io-platform-api
+    environment: production
+    project: devopss-io-platform
+  name: devopss-io-ingress-api
+  namespace: devopss-platform
+spec:
+  rules:
+
+#### CMS CDN App
+  - host: image.fileservice.dev
+    http:
+      paths:
+      - backend:
+          serviceName: app-cms-cdn-service
+          servicePort: 80
+        path: /
+
+#### File service (nginx)
+  - host: storage.fileservice.dev
+    http:
+      paths:
+      - backend:
+          serviceName: core-upload-api-nginx-service
+          servicePort: 80
+        path: /
+
+
+#### File service (api)
+  - host: fs.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: core-upload-api-service
+          servicePort: 80
+        path: /
+
+#### Core Account MAIN API
+  - host: main.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: core-account-api-service
+          servicePort: 80
+        path: /
+
+#### Core SSO API
+  - host: sso.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: core-auth-api-service
+          servicePort: 80
+        path: /
+
+
+#### Monitoring Api App
+  - host: monitoring.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-monitoring-api-service
+          servicePort: 80
+        path: /
+
+#### CMS App API
+  - host: cms.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-cms-api-service
+          servicePort: 80
+        path: /
+
+#### App's SSO/Auth API
+  - host: auth.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-auth-api-service
+          servicePort: 80
+        path: /
+
+#### App's SmartProcess API
+  - host: smartprocess.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-smartprocess-api-service
+          servicePort: 80
+        path: /
+
+
+#### App's Rocket Designer API
+  - host: rocket.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-rocket-designer-api-service
+          servicePort: 80
+        path: /
+
+#### App's Rocket Executor API
+  - host: rocketapp.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-rocket-executor-api-service
+          servicePort: 80
+        path: /
+
+#### App's Calendar API
+  - host: calendar.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-calendar-api-service
+          servicePort: 80
+        path: /
+
+#### App's Calendar API
+  - host: chat.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-chat-api-service
+          servicePort: 80
+        path: /
+
+#### App's Mail Client Monolitic API
+  - host: mail-mono.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-mail-api-service
+          servicePort: 80
+        path: /
+      - backend:
+          serviceName: app-mail-api-service
+          servicePort: 80
+        path: /api/v1
+
+#### App's Mail Client Monolitic API
+  - host: mail-admin.api.devopss.io
+    http:
+      paths:
+      - backend:
+          serviceName: app-mail-api-service
+          servicePort: 80
+        path: /
+      - backend:
+          serviceName: app-mail-admin-service
+          servicePort: 80
+        path: /api/v1

@@ -1,0 +1,3 @@
+---
+monit_rules_files: ["haproxy.monit"]
+goss_test_files: ["haproxy.yml"]

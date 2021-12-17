@@ -1,0 +1,41 @@
+---
+- name: create monit folders
+  file:
+    path: "/var/lib/monit"
+    state: directory
+    recurse: "yes"
+    mode: "0755"
+    owner: root
+    group: root
+
+# monit config config
+- name: Copy "monit2telegram.j2"
+  template:
+    src: "monit2telegram.j2"
+    dest: "/etc/monit.d/monit2telegram"
+    owner: root
+    group: root
+    mode: "0755"
+
+# monit config config
+- name: Copy "monitrc.j2"
+  template:
+    src: "monitrc.j2"
+    dest: "/etc/monitrc"
+    owner: root
+    group: root
+    mode: "0400"
+
+- name: Monit  -  import handlers tasks
+  import_tasks: handlers/main.yml
+
+- name: Check if the service is running on port 2812 on 127.0.0.1
+  wait_for:
+    host: "127.0.0.1"
+    port: 2812
+    delay: 5
+    timeout: 60
+#
+#- name: import goss test role
+#  import_role:
+#    name: goss_test

@@ -1,0 +1,17 @@
+- type: http
+  name: http/https with status 200
+  schedule: '@every 60s'
+  urls: [ {% for host in groups['web-200-group'] %}"{{ hostvars[host].url }}",{% endfor %} ]
+  check.response.status: 200
+
+- type: http
+  name: http/https with status 401 Unauthorized
+  schedule: '@every 60s'
+  urls: [ {% for host in groups['web-401-group'] %}"{{ hostvars[host].url }}",{% endfor %} ]
+  check.response.status: 401
+
+- type: http
+  name: http/https with status 404 Not Found
+  schedule: '@every 60s'
+  urls: [ {% for host in groups['web-404-group'] %}"{{ hostvars[host].url }}",{% endfor %} ]
+  check.response.status: 404

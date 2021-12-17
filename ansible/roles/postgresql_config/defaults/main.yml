@@ -1,0 +1,4 @@
+---
+postgresql_config_pgdata: "/var/lib/pgsql/12/data"
+goss_test_files: ["postgresql.yml"]
+monit_rules_files: ["postgresql.monit"]

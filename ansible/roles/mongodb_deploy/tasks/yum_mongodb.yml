@@ -1,0 +1,7 @@
+---
+- name: add MongoDB official repository for CentOS
+  template:
+    src: templates/mongodb-org-x.x.repo.j2
+    dest: /etc/yum.repos.d/mongodb-org-{{ mongodb_deploy_version_major }}.{{ mongodb_deploy_version_minor }}.repo
+- name: yum install mongodb
+  yum: name=mongodb-org state=present update_cache=yes

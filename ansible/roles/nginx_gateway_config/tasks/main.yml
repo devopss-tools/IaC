@@ -1,0 +1,42 @@
+---
+- name: Clean nginx config folders
+  find: path=/etc/nginx/conf.d file_type=file
+  register: files
+
+- file: state=absent path={{ item.path }}
+  with_items: 
+    - "{{ files.files }}"
+
+
+- name: Set 0755 permissions to folder /etc/nginx/ssl
+  file:
+    path: "/etc/nginx/ssl"
+    state: directory
+    mode: 0755
+    owner: nginx
+    group: nginx
+
+#- copy:
+#    src: "{{nginx_cert_auth_path}}/{{ item.1 }}"
+#    dest: /etc/nginx/ssl
+#    owner: nginx
+#    mode: "0644"
+#  with_subelements:
+#  - "{{auth_cert}}"
+#  - keys
+#
+
+#- name: Copy Nginx SSL files for testprod
+#  copy:
+#    src: "{{ item }}"
+#    dest: /etc/nginx/ssl
+#    owner: nginx
+#    mode: "0644"
+#  with_items:
+#     - "{{certificates_root_path}}/nginx_cert_auth/nginx-gateway.pem"
+#     - "{{certificates_root_path}}/nginx_cert_auth/nginx-gateway-key.pem"
+#     - "{{certificates_root_path}}/nginx_cert_auth/ca.pem"
+#  when: env_name == 'testprod'
+
+- import_role:
+      name: nginx_config

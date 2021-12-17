@@ -1,0 +1,22 @@
+{
+  "CN": "kubernetes",
+  "hosts": [
+      "k8smd01.devopss.dev","k8smd02.devopss.dev","k8smd03.devopss.dev",
+      "172.18.0.1",
+      "127.0.0.1",
+      "kubernetes.default"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "MD",
+      "L": "Chishinau",
+      "O": "Kubernetes",
+      "OU": "Cluster",
+      "ST": "Chishinau"
+    }
+  ]
+}

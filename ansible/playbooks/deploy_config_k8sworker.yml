@@ -1,0 +1,26 @@
+---
+- name: deploy kubernetes worker
+  become: true
+  serial: 1
+  hosts: k8s-worker-group
+  roles:
+#    # deploy kube_worker
+#    - { role: package, pkgs: ["iptables", "iptables-services", "iptables-utils", "unzip", "tar", "socat", "util-linux", "libseccomp", "btrfs-progs"] , tags: [ "k8sworker_deploy"]}
+#    - { role: iptables_deploy_config, tags: [ "k8sworker_deploy"]}
+#    - { role: package_download,
+#             pkgs:
+#                [
+#                  {"name" : "kubectl", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kubectl"},
+#                  {"name" : "kube-proxy", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kube-proxy"},
+#                  {"name" : "kubelet", "url" : "http://{{ devopss_nexus_user_repo }}@{{ devopss_internal_nexus_address_name }}:8081/repository/raw-repository/kubernetes/{{ k8s_version }}/linuxAmd64/kubelet"}
+#                ],
+#              tags: [ "k8sworker_deploy"]
+#      }
+#    - { role: container_network_install, tags: [ "k8sworker_deploy"]}
+#    - { role: container_network_config, tags: [ "k8sworker_config" ]}
+    - { role: kubelet_config, tags: [ "k8sworker_config"]}
+#    - { role: kubernetes_proxy_config, tags: [ "k8sworker_config"]}
+## Run k8s worker components Goss tests
+#    - { role: container_network_config }
+#    - { role: kubernetes_proxy_config }
+    - { role: kubelet_config }

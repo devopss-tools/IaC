@@ -1,0 +1,5 @@
+---
+container_docker_image: "sonatype/nexus3"
+container_docker_tag: "3.18.1"
+container_nexus_data_dir: "/nexus-data"
+

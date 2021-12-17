@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: kibana-monitoring
+  name: kibana-monitoring
+  namespace: monitoring
+spec:
+  replicas: {{ kibana_replica_number }}
+  selector:
+    matchLabels:
+      k8s-app: kibana-monitoring
+  template:
+    metadata:
+      labels:
+        k8s-app: kibana-monitoring
+    spec:
+      containers:
+      - name: kibana-monitoring
+        image: docker.elastic.co/kibana/kibana:{{ kibana_version }}
+        ports:
+        - containerPort: 5601
+          protocol: TCP
+        env:
+        - name: SERVER_NAME
+          value: "{{ kibana_host }}"
+        - name: ELASTICSEARCH_HOSTS
+          value: '[{% for host in groups['es-monitoring-group'] %}"http://{{ hostvars[host].ansible_host }}:{{ es_port }}"{% if not loop.last %},{% endif %}{% endfor %}]'
+#        livenessProbe:
+#          httpGet:
+#            scheme: HTTP
+#            path: /
+#            port: 5601
+#          initialDelaySeconds: 30
+#          timeoutSeconds: 30
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kibana-monitoring
+  name: kibana-monitoring
+  namespace: monitoring
+spec:
+  ports:
+    - port: {{ kibana_port }}
+      targetPort: 5601
+#      nodePort: 30056
+#  type: NodePort
+  type: ClusterIP
+  selector:
+    k8s-app: kibana-monitoring
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: kibana-monitoring-ingress
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: {{ kibana_host }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kibana-monitoring
+          servicePort: {{ kibana_port }}

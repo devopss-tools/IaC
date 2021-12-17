@@ -1,0 +1,11 @@
+---
+- name: Deploy containers to kubernetes
+  become: true
+  become_user: "{{ lookup('env','USER') }}"
+  hosts:
+    - localhost
+    - mailu-group
+  vars:
+    - ansible_python_interpreter: "{{ binaries_root_path }}/python_env/bin/python"
+  roles:
+    - { role: kubernetes_deploy_components }

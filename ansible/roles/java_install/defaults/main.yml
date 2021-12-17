@@ -1,0 +1,15 @@
+---
+# download link to Oracle JDK rpm package
+#jdk_url: https://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/jdk-8u191-linux-x64.rpm
+#jdk_url: http://nexus.devopss.internal/repository/uploads/jdk-8u212-linux-x64.rpm
+#jdk_url: https://download.oracle.com/otn/java/jdk/8u212-b10/59066701cf1a433da9770636fbc4c9aa/jdk-8u212-linux-x64.rpm
+jdk_url: https://cdn.azul.com/zulu/bin/zulu8.38.0.13-ca-jdk8.0.212-linux.x86_64.rpm
+jdk_filename: "{{jdk_url | basename}}"
+#new_java_version: "1.{{ jdk_filename | regex_replace('jdk-(\\d+)u(\\d+)-linux.*','\\1') }}.0_{{ jdk_filename | regex_replace('jdk-(\\d+)u(\\d+)-linux.*','\\2')}}"
+new_java_version: ""
+
+#java_home: "/usr/java/jdk{{ new_java_version }}"
+java_home: "/usr/lib/jvm/zulu-8{{ new_java_version }}"
+
+
+

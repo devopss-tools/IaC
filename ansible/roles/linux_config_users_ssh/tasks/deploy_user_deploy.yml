@@ -1,0 +1,52 @@
+---
+- name: add group deploy
+  group:
+    name: "{{ linux_config_deploy_group_name }}"
+    state: present
+  tags: "ssh_user_deploy"
+
+- name: add user deploy
+  user:
+    name: "{{ linux_config_deploy_user_name }}"
+    comment: "devopss , technical user for deployment"
+    shell: /bin/bash
+    groups: "{{ linux_config_deploy_group_name }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+  tags: "ssh_user_deploy"
+
+- name: add deploy ssh keys and remove absent keys
+  authorized_key:
+    user: "{{ linux_config_deploy_user_name }}"
+    state: present
+    manage_dir: yes
+    key: "{% for key in lookup('fileglob', 'deploy_pub_ssh_keys/*' ).split(',') %}{{ lookup('file', key) ~ '\n'}}{% endfor %}"
+    exclusive: True
+  tags: "ssh_user_deploy"
+
+- name: repeat add deploy_user ssh keys
+  authorized_key:
+    user: "{{ linux_config_deploy_user_name }}"
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', item) }}"
+  tags: "ssh_user_deploy"
+  with_fileglob:
+    - "deploy_pub_ssh_keys/*"
+
+- name: set deploy user_name_fact
+  set_fact:
+    user_name_fact: "{{ linux_config_deploy_user_name }}"
+  tags: "ssh_user_deploy"
+
+- name: add deploy into sudoers
+  template:
+    src: deploy.j2
+    dest: "/etc/sudoers.d/{{ linux_config_deploy_user_name }}"
+    owner: root
+    group: root
+    mode: "0400"
+    backup: yes
+  tags: "ssh_user_deploy"
+

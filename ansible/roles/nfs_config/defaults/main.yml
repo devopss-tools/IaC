@@ -1,0 +1,3 @@
+---
+goss_test_files: ["nfs.yml"]
+monit_rules_files: ["nfs.monit"]

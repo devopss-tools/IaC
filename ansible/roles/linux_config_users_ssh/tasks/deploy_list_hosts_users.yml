@@ -1,0 +1,51 @@
+---
+- name: add group {{ os_group_fact }}
+  group:
+    name: "{{ os_group_fact }}"
+    state: present
+  when: ansible_host == user_host
+
+- name: add user
+  user:
+    name: "{{ user_name_fact }}"
+    comment: "devopss , technical user for deployment"
+    shell: /bin/bash
+    groups: "{{ os_group_fact }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    expires: -1
+  register: add_user
+  when: ansible_host == user_host
+
+- name: add ssh keys
+  authorized_key:
+    user: "{{ user_name_fact }}"
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', key_item ) }}"
+    exclusive: True
+  register: add_key
+  with_fileglob:
+    - "{{ repo_pub_ssh_keys }}/{{ user_name_fact }}.pub"
+  loop_control:
+    loop_var: key_item
+  when: ansible_host == user_host
+
+- name: add deploy into sudoers
+  template:
+    src: deploy.j2
+    dest: "/etc/sudoers.d/{{ user_name_fact }}"
+    owner: root
+    group: root
+    mode: "0400"
+    backup: yes
+  when: os_group_fact == "deploy" and ansible_host == user_host
+
+- name: Result of add ssh keys from user directory
+  debug:
+    msg:
+      - "Deploy Public key status':' {{ add_key.results[0].user }} - {{ add_key.results[0].state }}"
+      - "Create OS User status':' {{ add_user.name }} - {{ add_user.state }} - {{ add_user.group }}."
+  when: ansible_host == user_host and add_key.results[0].user is defined and add_user.name is defined
+

@@ -1,0 +1,31 @@
+###################################    only for ELK  MONITORING      ###################################
+
+[web-200-group]
+####  Hosts for monitoring http/https status 200, ansible_host - need for check ssh port
+gateway-test-prod.devopss.net             ansible_host=10.3.3.187                     url=http://gateway-test-prod.devopss.net
+api.globaldatabase.com                  ansible_host=api.test.internal               url=https://api.globaldatabase.com
+globaltender.devopss.net                 ansible_host=tenders.test.internal           url=http://globaltender.devopss.net
+globaldigital.devopss.net                ansible_host=globaldigital.test.internal     url=http://globaldigital.devopss.net
+app.emailcheck.io                       ansible_host=emailcheck.test.internal        url=http://app.emailcheck.io
+globalsync.devopss.net                   ansible_host=globalsync.test.internal        url=http://globalsync.devopss.net
+globalnews.devopss.net                   ansible_host=globalnews.test.internal        url=http://globalnews.devopss.net
+test-billing-api.devopss.net              ansible_host=k8s.test.internal               url=http://test-billing-api.devopss.net
+test-notifications.devopss.net            ansible_host=k8s.test.internal               url=http://test-notifications.devopss.net
+platform.globaldatabase.com             ansible_host=k8s.test.internal               url=https://platform.globaldatabase.com
+account.globaldatabase.com              ansible_host=account.test.internal           url=https://account.globaldatabase.com/auth/login
+det1.devopss.net                         ansible_host=det1.test.internal              url=http://det1.devopss.net
+globalbot.devopss.net                    ansible_host=globalbot.test.internal         url=http://globalbot.devopss.net
+
+[web-302-group]     # HTTP/1.1 302 Found
+
+[web-401-group]     # HTTP/1.1 401 Unauthorized
+tendersapi.devopss.net                   ansible_host=tenders.test.internal           url=http://tendersapi.devopss.net
+
+[web-404-group]     # HTTP/1.1 404 Not Found
+dashboard-api.globaldatabase.com        ansible_host=k8s.test.internal               url=https://dashboard-api.globaldatabase.com
+
+[tcp-group]
+#feed.emailcheck.io                      ansible_host=feed.emailcheck.io:5622
+
+
+

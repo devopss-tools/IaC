@@ -1,0 +1,56 @@
+namespaces:
+  fine-credit:
+    name: fine-credit
+    userName: admin-fine-credit
+    serviceAccount: admin-fine-credit
+    role: admin-fine-credit
+    status: active
+  admitere:
+    name: admitere
+    userName: admin-admitere
+    serviceAccount: admin-admitere
+    role: admin-admitere
+    status: active
+  devopss-platform:
+    name: devopss-platform
+    userName: admin-devopss-platform
+    serviceAccount: admin-devopss-platform
+    role: admin-devopss-platform
+    status: active
+  abacmobile:
+    name: abac-mobile
+    userName: admin-abac-mobile
+    serviceAccount: admin-abac-mobile
+    role: admin-abac-mobile
+    status: active
+  abacpayment:
+    name: abac-payment
+    userName: admin-abac-payment
+    serviceAccount: admin-abac-payment
+    role: admin-abac-payment
+    status: active
+  5amclub:
+    name: 5amclub
+    userName: admin-5amclub
+    serviceAccount: admin-5amclub
+    role: admin-5amclub
+    status: active
+  stopfals:
+    name: stopfals
+    userName: admin-stopfals
+    serviceAccount: admin-stopfals
+    role: admin-stopfals
+    status: active
+  zoomcredit:
+    name: zoomcredit
+    userName: admin-zoomcredit
+    serviceAccount: admin-zoomcredit
+    role: admin-zoomcredit
+    status: active
+  lensa:
+    name: lensa
+    userName: admin-lensa
+    serviceAccount: admin-lensa
+    role: admin-lensa
+    status: active
+

@@ -1,0 +1,54 @@
+---
+k8s_version: v1.18.0
+linux_filesystem_map: [ {"dev" : "/dev/sdb", "fstype" : "ext4", "path" : "/var/lib/kubernetes"} ]
+service_cluster_ip_range: 172.18.0.0/16
+k8s_api_server_ip: 172.18.0.1
+k8s_certificate_root_path: "{{ certificates_root_path }}/k8s"
+etcd_certificate_root_path: "{{ certificates_root_path }}/etcd"
+
+
+
+# Firewall settings
+firewalld_port:
+  kube-apiserver-1:
+    port: 6443
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  kube-apiserver-2:
+    port: 8080
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  kubelet-api:
+    port: 10250
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  kube-scheduler:
+    port: 10251
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  kube-controller-manager:
+    port: 10252
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  readonly-kubelet-api:
+    port: 10255
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  etcd:
+    port: 2379-2380
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true

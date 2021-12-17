@@ -1,0 +1,9 @@
+---
+- name: download package "{{ item.name }}"
+  get_url:
+    url: "{{ item.url }}"
+    dest: "/usr/local/sbin/"
+    mode: "0755"
+    owner: root
+    group: root
+  with_items: "{{ pkgs }}"

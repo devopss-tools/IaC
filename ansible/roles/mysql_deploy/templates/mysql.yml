@@ -1,0 +1,12 @@
+service:
+  mysqld:
+    enabled: true
+    running: true
+
+command:
+    mysql --version:
+      stdout:
+         - {{ mysql_version }}
+      exit-status: 0
+      timeout: 1000
+

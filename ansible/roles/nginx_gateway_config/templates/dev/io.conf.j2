@@ -1,0 +1,78 @@
+upstream devopss_io {
+     least_conn;
+     {% for var in upstream %}  server   {{ var.k8s_Ingress_Controller_Host }};
+     {% endfor %}
+}
+
+server {
+    server_name *.fileservice.dev;
+    client_max_body_size 500M;
+    location / {
+        proxy_pass http://devopss_io;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    listen 80;
+}
+
+server {
+    server_name fs.api.dev.devopss.io;
+    client_max_body_size 500M;
+    location / {
+        proxy_pass http://devopss_io;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    listen 80;
+}
+
+server {
+    server_name *.api.devopss.io;
+#    client_max_body_size 500M;
+    location / {
+#        add_header Access-Control-Allow-Origin *;
+        proxy_pass http://devopss_io;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/api.devopss.io/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/api.devopss.io/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+    server_name *.devopss.io;
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        if (!-f $request_filename) {
+            proxy_pass http://devopss_io;
+            break;
+        }
+        add_header Set-Cookie cip=$remote_addr;
+        add_header Set-Cookie chost=$Host;
+    }
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/devopss.io/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/devopss.io/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    server_name *.devopss.io;
+    listen 80;
+    return 301 https://$host$request_uri;
+}

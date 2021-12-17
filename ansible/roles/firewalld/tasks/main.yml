@@ -1,0 +1,45 @@
+---
+
+- name: Install firewalld
+  become: yes
+  package:
+    name: firewalld
+    state: "{{ firewalld_state }}"
+
+- name: Start and set up firewalld
+  become: yes
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+- name: Update firewall sources
+  become: yes
+  firewalld:
+    source: "{{ item.value.source }}"
+    permanent: "{{ item.value.permanent }}"
+    state: "{{ item.value.state }}"
+    zone: "{{ item.value.zone }}"
+  with_dict: "{{ firewalld_rules }}"
+  when: firewalld_rules is defined
+  notify: restart firewalld
+
+- name: Update firewall ports
+  become: yes
+  firewalld:
+    port: "{{ item.value.port }}/{{ item.value.protocol }}"
+    permanent: "{{ item.value.permanent }}"
+    state: "{{ item.value.state }}"
+    zone: "{{ item.value.zone }}"
+  with_dict: "{{ firewalld_port }}"
+  when: firewalld_port is defined
+  notify: restart firewalld
+
+- name: Check firewall configuration
+  command: firewall-cmd --list-all
+  when: firewalld_debug
+  register: check_firewalld
+
+- name: Print firewall configuration
+  debug: msg="{{ check_firewalld.stdout_lines }}"
+  when: firewalld_debug

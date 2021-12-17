@@ -1,0 +1,26 @@
+- name: systemd_reload
+  shell: systemctl daemon-reload
+
+# enable zookeeper service
+- name: zookeeper_enable
+  service:
+    name: zookeeper
+    enabled: yes
+
+# enable kafka service
+- name: kafka_enable
+  service:
+    name: kafka
+    enabled: yes
+
+# restart zookeeper service
+- name: zookeeper_restart
+  service:
+    name: zookeeper
+    state: restarted
+
+# restart kafka service
+- name: kafka_restart
+  service:
+    name: kafka
+    state: restarted

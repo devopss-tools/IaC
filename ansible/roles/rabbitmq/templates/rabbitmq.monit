@@ -1,0 +1,5 @@
+check host localhost with address {{ansible_currentHost_fact_ip}}
+  start program = "/bin/systemctl start {{rabbitmq_daemon}}" with timeout 60 seconds
+  stop program = "/bin/systemctl stop {{rabbitmq_daemon}}"
+  if failed port 5672 then exec "/etc/monit.d/monit2telegram RabbitMQ"  repeat every 2 cycles
+  if failed port 5672 then restart every 5 cycles

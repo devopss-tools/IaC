@@ -1,0 +1,74 @@
+---
+- name: Ecrypt files
+  shell: "ansible-vault encrypt {{item.src}} --vault-password-file={{ansible_root_path }}/../.vault_password; exit 0"
+  when: item.state == 'file' and ( item.src is regex(".*\.csr") or item.src is regex(".*\.pem") or item.src is regex(".*\.kubeconfig") )
+  with_filetree:
+    - "{{certificates_root_path}}/"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  tags:
+    - encryption
+
+- name: Chek files encryption
+  shell: "head -1 {{item.src}} | grep 'ANSIBLE_VAULT' "
+  register: result_encryption
+  when: item.state == 'file' and ( item.src is regex(".*\.csr") or item.src is regex(".*\.pem") or item.src is regex(".*\.kubeconfig") )
+  with_filetree:
+    - "{{certificates_root_path}}/"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  tags:
+    - encryption
+
+############    Decryption  ############
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ansible_root_path}}/../target"
+    state: absent
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  tags:
+    - decryption
+
+- name: Create a directory if it does not exist
+  file:
+    path: "{{ansible_root_path}}/../target"
+    state: directory
+    mode: '0755'
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  tags:
+    - decryption
+
+- name: Ansible copy directory to the remote server
+  copy:
+    src: "{{ansible_root_path }}/certificates"
+    dest: "{{ansible_root_path}}/../target/"
+  become_user: "{{ lookup('env','USER') }}"
+  run_once: true
+  tags:
+    - decryption
+#
+#
+#- name: Create a subdirectories if it does not exist
+#  file:
+#    path: "{{ansible_root_path}}/../target/{{item.path}}"
+#    state: directory
+#    mode: '0755'
+#  become_user: "{{ lookup('env','USER') }}"
+#  run_once: true
+#  when: item.state == 'directory'
+#  with_filetree:
+#    - "{{certificates_root_path}}/"
+#  tags:
+#    - decryption
+#
+#- name: Decrypt files
+#  shell: "ansible-vault decrypt {{item.src}} --vault-password-file={{ansible_root_path }}/../.vault_password --output {{ansible_root_path}}/../target/{{item.path}}; exit 0"
+#  when: item.state == 'file' and ( item.src is regex(".*\.csr") or item.src is regex(".*\.pem") or item.src is regex(".*\.kubeconfig") )
+#  with_filetree:
+#    - "{{certificates_root_path}}/"
+#  become_user: "{{ lookup('env','USER') }}"
+#  run_once: true
+#  tags:
+#    - decryption

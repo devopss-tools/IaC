@@ -1,0 +1,5 @@
+---
+ansible_python_interpreter: "{{ binaries_root_path }}/python_env/bin/python"
+k8s_access_roles_dir: "{{ ca_certificate_root_path }}/k8s_access_roles"
+kubeadmin_dir: "{{certificates_root_path_target}}/k8s_access_roles/kubeadmin"
+#kubeadmin_dir: "{{certificates_root_path}}/k8s_access_roles/kubeadmin"

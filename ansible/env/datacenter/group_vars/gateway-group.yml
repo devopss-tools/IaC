@@ -1,0 +1,70 @@
+# Firewall settings
+firewalld_port:
+  http:
+    port: 80
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+  https:
+    port: 443
+    protocol: tcp
+    state: enabled
+    zone: public
+    permanent: true
+
+# Kubernetes Ingress external IPs, upstream's
+upstream: [
+            {"k8s_Ingress_Controller_Host" : "10.1.1.93"}, # some problems with iptables
+            {"k8s_Ingress_Controller_Host" : "10.1.1.96"},
+            {"k8s_Ingress_Controller_Host" : "10.1.1.98"}
+          ]
+
+nginx_config_virtulhost_files: [
+                                 {"src" : "404.conf.j2", "dest" : "404.conf"},
+                                 {"src" : "application.lensa.ro.conf.j2", "dest" : "application.lensa.ro.conf"},
+                                 {"src" : "dashboard.lensa.ro.conf.j2", "dest" : "dashboard.lensa.ro.conf"},
+                                 {"src" : "zoomcredit.conf.j2", "dest" : "zoomcredit.conf"},
+                                 {"src" : "finecredit.conf.j2", "dest" : "finecredit.conf"},
+                                 {"src" : "devopss-io.conf.j2", "dest" : "devopss-io.conf"},
+                                 {"src" : "core-account-ui.conf.j2", "dest" : "core-account-ui.conf"},
+                                 {"src" : "abac-mobile-api.conf.j2", "dest" : "zoom-mob-api.abac.md.conf"},
+                                 {"src" : "zoom-payment-api.conf.j2", "dest" : "zoom-payment-api.devopss.net.conf"},
+                                 {"src" : "whmcs.datacenter.eu.conf.j2", "dest" : "whmcs.datacenter.eu.conf"}
+                              ]
+
+#auth_cert:
+#- virualhost: "aggregator-api.testdata.com"
+#  keys:
+#  - "aggregator-api.testdata.com.pem"
+#  - "aggregator-api.testdata.com-key.pem"
+#  - "ca.pem"
+
+notfound: {"domain": "notfound.devopss.net", "port": 80, "path" : "/", "proxypass": "404" }
+app_lensa: {"domain": "application.lensa.ro", "port": 30101, "media_service_port": 30104 }
+dashboard_lensa: {"domain": "dashboard.lensa.ro", "port": 80 }
+zoomcredit: {"domain": "zoomcredit.md", "port": 30001 }
+finecredit: {"domain": "finecredit.md", "port": 80, "path" : "/", "proxypass": "/" }
+devopss_io_all_api: {"domain": "*.api.devopss.io", "port": 80, "path" : "/", "proxypass": "/" }
+devopss_io_all: {"domain": "*.devopss.io", "port": 80, "path" : "/", "proxypass": "/" }
+core_account_ui: {"domain": "account.devopss.io", "port": 80, "path" : "/", "proxypass": "/" }
+abacmobile: {"domain": "zoom-mob-api.abac.md", "port": 80, "path" : "/", "proxypass": "404" }
+abacpayment: {"domain": "zoom-payment-api.devopss.net", "port": 80, "path" : "/", "proxypass": "/" }
+whmcs_datacenter: {"domain": "whmcs.datacenter.eu", "port": 80, "path" : "/", "proxypass": "/" }
+
+
+#nginx_cert_auth_path: "{{root_path}}/ansible/certificates/testprod/nginx_cert_auth"
+
+#emailcheck: {"domain": "app.emailcheck.io", "port": 80, "path" : "/", "hostproxy": "emailcheck.test.internal" }
+
+# public pages with ssl
+#publicpages_it: {"domain": "publicpages.devopss.net", "port": 80, "path" : "/", "hostproxy": "publicpages.test.internal" }
+
+
+## Proxy to private hosts
+## Migrated
+#tendersapi: {"domain": "tendersapi.devopss.net", "port": 80, "path" : "/", "hostproxy": "tenders.test.internal:8000" }
+#
+## Proxy to Kubernetes Ingress
+## Migrated
+#dashboardapi: {"domain": "dashboard-api.globaldatabase.com", "port": 80, "path" : "/", "proxypass": "/" }

@@ -1,0 +1,6 @@
+---
+etcd_config_dir: "/etc/etcd"
+etcd_config_file: "{{ etcd_config_dir }}/etcd.conf"
+etcd_config_datadir: "/var/lib/kubernetes/etcd/data"
+etcd_config_waldir: "/var/lib/kubernetes/etcd/wal"
+goss_test_files: ["etcd.yml"]

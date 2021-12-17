@@ -1,0 +1,33 @@
+---
+- name: add group
+  group:
+    name: "{{ linux_config_deploy_group_name }}"
+    state: present
+
+- name: add user
+  user:
+    name: "{{ linux_config_deploy_user_name }}"
+    comment: "devopss , technical user for deployment"
+    shell: /bin/bash
+    groups: "{{ linux_config_deploy_group_name }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+
+- name: add ssh keys
+  authorized_key:
+    user: "{{ linux_config_deploy_user_name }}"
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "pub_ssh_key/*"
+
+- name: add deploy into sudoers
+  template:
+    src: deploy.j2
+    dest: "/etc/sudoers.d/deploy"
+    owner: root
+    group: root
+    mode: "0400"
+    backup: yes

@@ -1,0 +1,4 @@
+---
+- name: config hostname
+  hostname:
+    name: "{{ ansible_host }}"

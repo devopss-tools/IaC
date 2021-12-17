@@ -1,0 +1,19 @@
+# version 0.2
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.service
+
+[Service]
+ExecStart=/usr/local/sbin/kube-proxy \
+     --bind-address={{ ansible_currentHost_fact_ip }} \
+     --cluster-cidr={{ cluster_cidr }} \
+     --kubeconfig=/var/lib/kubernetes/kube-proxy/kubeconfig \
+     --proxy-mode=iptables  \
+     --logtostderr=true  \
+     --v=4
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

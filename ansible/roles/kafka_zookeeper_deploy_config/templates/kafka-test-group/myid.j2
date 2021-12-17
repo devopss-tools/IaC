@@ -1,0 +1,1 @@
+{% for host in groups['kafka-test-group'] %}{% if hostvars[host]['ansible_host'] == ansible_host %}{{loop.index}}{% endif %}{% endfor %}

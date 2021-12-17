@@ -1,0 +1,4 @@
+---
+selinux_policy_compile_module: "checkmodule -M -m -o {{ item[:-3] }}.mod {{ item }}"
+selinux_policy_create_package: "semodule_package -o {{ item[:-3] }}.pp -m {{ item[:-3] }}.mod"
+selinux_policy_load_module: "semodule -i {{ item[:-3] }}.pp"

@@ -1,0 +1,66 @@
+---
+- name: postgresql
+  become: true
+  hosts:
+    - pgsql-test-group
+    - pgsql-agg-group
+    - pgsql-platform-group
+    - pgsql-lensa-group
+  roles:
+    # Install postgresql12
+    - { role: package, pkgs: ["{{ pgsql_libs_rpm_url }}"] , tags: [ "pg12_install"]}
+    - { role: package, pkgs: ["{{ pgsql_rpm_url }}"] , tags: [ "pg12_install"]}
+    - { role: package, pkgs: ["{{ pgsql_server_rpm_url }}"] , tags: [ "pg12_install"]}
+    - { role: package, pkgs: ["{{ pgsql_contrib_rpm_url }}"] , tags: [ "pg12_install"]}
+    - { role: package, pkgs: ["{{ python_rpm_url }}"] , tags: [ "pg12_install"]}
+
+    # InitDB for postgresql12
+    - { role: postgresql_initdb, postgresql_initdb_admin: "{{ db_su_admin_name }}",  tags: [ "pg12_initdb"]}
+
+    # postgresql12 config
+    - {
+        role: postgresql_config,
+        postgresql_config_hba:
+          [
+            {"type" : "local", "database" : "all", "user" : "{{ db_su_admin_name }}", "address" : "" ,"method" : "md5"},
+            {"type" : "host", "database" : "all", "user" : "all", "address" : "10.1.1.0/24" ,"method" : "md5"},
+            {"type" : "host", "database" : "all", "user" : "all", "address" : "10.3.3.0/24" ,"method" : "md5"},
+            {"type" : "host", "database" : "all", "user" : "all", "address" : "10.5.5.0/24" ,"method" : "md5"}, # VPN connection
+            {"type" : "host", "database" : "all", "user" : "all", "address" : "185.181.231.0/24" ,"method" : "md5"},
+            {"type" : "host", "database" : "all", "user" : "all", "address" : "192.168.88.0/24" ,"method" : "md5"}
+
+          ],
+        tags: [ "pg12_config"]
+      }
+
+    # devopssdb
+    - { role: postgresql_db_config,
+              postgresql_db_config_name: "{{ db_name }}",
+              postgresql_db_config_login_user: "{{ db_su_admin_name }}",
+              postgresql_db_config_login_password: "{{ devopss_su_admin_passwd }}",
+              postgresql_db_config_users:
+                [
+                  {"name" : "db_user", "password" : "{{ devopss_db_user_passwd }}", "priv" : "CONNECT"},
+                  {"name" : "db_admin", "password" : "{{ devopss_db_admin_passwd }}", "priv" : "ALL"}
+                ],
+              tags: [ "pg12_config"]
+      }
+
+#- name: devopss-pgbouncer
+#  become: true
+#  hosts: test-group
+#  roles:
+#    # Install pgbouncer
+#    - { role: package, pkgs: ["https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm"] , tags: [ "pgbouncer_install"]}
+#    - { role: package, pkgs: ["pgbouncer", postgresql10] , tags: [ "pgbouncer_install"]}
+#    # pgbouncer config
+#    - { role: pgbouncer_config,
+#        pgbouncer_allowed_users:
+#              [
+#                {"name" : "{{ db_su_admin_name }}", "password" : "md5{{ ( devopss_su_admin_passwd + 'devopss_su_admin' )|hash('md5') }}"},
+#                {"name" : "db_admin", "password" : "md5{{ ( devopss_db_admin_passwd + 'db_admin' )|hash('md5') }}"},
+#                {"name" : "db_user", "password" : "md5{{ ( devopss_db_user_passwd + 'db_user' )|hash('md5') }}"}
+#
+#              ],
+#        tags: [pgbouncer_config]
+#      }

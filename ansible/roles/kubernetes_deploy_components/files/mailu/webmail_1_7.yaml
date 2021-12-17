@@ -1,0 +1,66 @@
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: mailu-roundcube
+#  namespace: devopss-platform-mailserver
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: mailu-roundcube
+#      role: mail
+#      tier: frontend
+#  template:
+#    metadata:
+#      labels:
+#        app: mailu-roundcube
+#        role: mail
+#        tier: frontend
+#    spec:
+#      containers:
+#      - name: roundcube
+#        image: mailu/roundcube:{{ mailu_version }}
+#        imagePullPolicy: Always
+#        envFrom:
+#          - configMapRef:
+#              name: mailu-config
+##          - configMapRef:
+##              name: mailu-roundcube-config
+#        resources:
+#          requests:
+#            memory: 100Mi
+#            cpu: 100m
+#          limits:
+#            memory: 200Mi
+#            cpu: 200m
+#        volumeMounts:
+#          - mountPath: /data
+#            name: maildata
+#            subPath: webmail
+#        ports:
+#          - containerPort: 80
+#      volumes:
+#        - name: maildata
+#          persistentVolumeClaim:
+#            claimName: mail-storage
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: webmail
+#  namespace: devopss-platform-mailserver
+#  labels:
+#    app: mailu-roundcube
+#    role: mail
+#    tier: frontend
+#spec:
+#  type: ClusterIP
+#  clusterIP: "{{ webmail_k8s_svc_ip }}"
+#  selector:
+#    app: mailu-roundcube
+#    role: mail
+#    tier: frontend
+#  ports:
+#  - name: http
+#    port: 80
+#    protocol: TCP

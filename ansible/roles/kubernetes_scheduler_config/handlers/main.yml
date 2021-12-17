@@ -1,0 +1,15 @@
+---
+- name: systemd_reload
+  shell: systemctl daemon-reload
+
+# enable kube_scheduler service
+- name: kube_scheduler_enable
+  service:
+    name: kube-scheduler
+    enabled: yes
+
+# restart kube_scheduler service
+- name: kube_scheduler_restart
+  service:
+    name: kube-scheduler
+    state: restarted
